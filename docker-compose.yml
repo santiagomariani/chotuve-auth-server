@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+    auth-server:
+        container_name: chotube_auth-server
+        build: 
+            context: .
+            dockerfile: Dockerfile.development
+        restart: always
+        ports:
+        - "3000:5000" 
+        volumes:
+        - ./:/app
