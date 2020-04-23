@@ -3,15 +3,13 @@ FROM python:3
 
 WORKDIR /app
 
-# flask envs
-ENV FLASK_APP=api.py
-ENV FLASK_ENV=development
-
-COPY ./requirements.txt .
+COPY . .
 
 RUN pip install -r requirements.txt
 RUN pip install gunicorn
 
-COPY . .
+# flask envs
+ENV FLASK_APP=api.py
+ENV FLASK_ENV=development
 
 ENTRYPOINT ["sh", "/app/docker-entrypoint-prod.sh"]

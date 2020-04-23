@@ -1,1 +1,1 @@
-gunicorn -b :5000 api:app
+gunicorn -b :$PORT api:app
