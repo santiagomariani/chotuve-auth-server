@@ -19,14 +19,14 @@ script:
   #- yarn build
   # build docker images
   - docker build -t chotube-auth-server .
-  - docker tag chotube-auth-server registry.heroku.com/$HEROKU_APP_NAME/web
+  - docker tag chotube-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web
 
 deploy:
   provider: script
   script: 
     # push to dockerhub & heroku
     docker push santiagomariani/chotube-auth-server;
-    docker push registry.heroku.com/$HEROKU_APP_NAME/web;
-    heroku container:release web --app $HEROKU_APP_NAME
+    docker push registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web;
+    heroku container:release web --app $HEROKU_AUTHSERVER_APP_NAME
   on:
     branch: master
