@@ -4,4 +4,4 @@ def sum(x, y):
     return x + y
 
 def test_answer():
-    assert sum(3, 4) == 8
+    assert sum(3, 4) == 7
