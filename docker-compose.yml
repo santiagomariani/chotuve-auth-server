@@ -8,6 +8,6 @@ services:
             dockerfile: Dockerfile.development
         restart: always
         ports:
-        - "3000:5000" 
+        - "4000:5000" 
         volumes:
         - ./:/app

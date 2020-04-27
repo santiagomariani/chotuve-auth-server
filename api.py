@@ -20,7 +20,7 @@ app.secret_key = b'\x0c{|7\x05\\t\xfe\xc8\x99\xc4r\xda\x82\xcd\x19\xf6\x18$\xca\
 @app.route('/prueba', methods=['GET'])
 def test():
     result = {'message':'hola como estas'}
-    return jsonify(result)   
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

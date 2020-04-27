@@ -8,7 +8,7 @@ help: ## This help.
 DOCKER_CMD = docker
 COMPOSE_CMD = docker-compose
 ## All the containers names must have this prefix (this is container name in compose file)
-NAME_PREFIX = chotube_
+NAME_PREFIX = chotuve_
 
 # DOCKER TASKS (for all containers)
 
@@ -33,7 +33,7 @@ ps: ## Display running containers
 version: ## Display docker-compose version
 	$(COMPOSE_CMD) --version
 exec:
-	$(DOCKER_CMD) docker exec -it chotube-auth-server sh
+	$(DOCKER_CMD) docker exec -it chotuve-auth-server sh
 
 
 ## AUTH SERVER

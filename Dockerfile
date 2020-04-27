@@ -6,7 +6,6 @@ WORKDIR /app
 COPY . .
 
 RUN pip install -r requirements.txt
-RUN pip install gunicorn
 
 # flask envs
 ENV FLASK_APP=api.py
