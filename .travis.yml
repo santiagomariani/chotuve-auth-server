@@ -18,7 +18,8 @@ script:
   # build docker images
   - docker build -t chotuve-auth-server .
   - docker tag chotuve-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web
-  - docker run -d -p 5000:5000 chotuve-auth-server /bin/sh -c "pytest"
+  - docker run -d -p 5000:5000 chotuve-auth-server
+  - docker exec -it chotuve_auth-server pytest
 
 
 deploy:
