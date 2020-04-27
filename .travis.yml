@@ -15,17 +15,15 @@ before_install:
 install:
 
 script:
-  #- yarn test
-  #- yarn build
   # build docker images
-  - docker build -t chotube-auth-server .
-  - docker tag chotube-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web
+  - docker build -t chotuve-auth-server .
+  - docker tag chotuve-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web
 
 deploy:
   provider: script
   script: 
     # push to dockerhub & heroku
-    docker push santiagomariani/chotube-auth-server;
+    docker push santiagomariani/chotuve-auth-server;
     docker push registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web;
     heroku container:release web --app $HEROKU_AUTHSERVER_APP_NAME
   on:

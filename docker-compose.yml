@@ -2,7 +2,7 @@ version: "3"
 
 services:
     auth-server:
-        container_name: chotube_auth-server
+        container_name: chotuve_auth-server
         build: 
             context: .
             dockerfile: Dockerfile.development
