@@ -20,11 +20,20 @@ ma = Marshmallow(app)
 # Set secret key
 #app.secret_key = b'\x0c{|7\x05\\t\xfe\xc8\x99\xc4r\xda\x82\xcd\x19\xf6\x18$\xca\xc2\xbc)\xe3'
 
+class Book(db.Model):
+    __tablename__ = "books"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+
+    def __init__(self, name):
+        self.name = name
+
 class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128), unique=True, nullable=False)
+    email = db.Column(db.String(128))
 
     def __init__(self, email):
         self.email = email
@@ -44,7 +53,6 @@ def add_user():
     user = User(data['email'])
     db.session.add(user)
     db.session.commit()
-    result = {'message':'hola como estas', 'email': data['email']}
     return user_schema.jsonify(user)
 
 @app.route('/user/<int:id>', methods=['GET'])
@@ -56,5 +64,5 @@ def get_user(id):
 def test():
     return 'hola como estas viejo'
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+#if __name__ == '__main__':
+#    app.run(host='0.0.0.0')
