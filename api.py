@@ -1,5 +1,7 @@
 import time
 import os
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 # flask
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
@@ -7,20 +9,52 @@ from flask import Flask, jsonify, request, session, redirect, url_for, make_resp
 # Init app
 app = Flask(__name__)
 
-# basedir = os.path.abspath(os.path.dirname(__file__))
+app.config.from_object("config.Config")
 
-# Database
+# databse
+db = SQLAlchemy(app)
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Init ma
+ma = Marshmallow(app)
 
 # Set secret key
-app.secret_key = b'\x0c{|7\x05\\t\xfe\xc8\x99\xc4r\xda\x82\xcd\x19\xf6\x18$\xca\xc2\xbc)\xe3'
+#app.secret_key = b'\x0c{|7\x05\\t\xfe\xc8\x99\xc4r\xda\x82\xcd\x19\xf6\x18$\xca\xc2\xbc)\xe3'
 
-@app.route('/prueba', methods=['GET'])
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(128), unique=True, nullable=False)
+
+    def __init__(self, email):
+        self.email = email
+
+# Goal Schema
+
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'email')
+
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
+
+@app.route('/user', methods=['POST'])
+def add_user():
+    data = request.json
+    user = User(data['email'])
+    db.session.add(user)
+    db.session.commit()
+    result = {'message':'hola como estas', 'email': data['email']}
+    return user_schema.jsonify(user)
+
+@app.route('/user/<int:id>', methods=['GET'])
+def get_user(id):
+    user = User.query.filter_by(id=id).first()
+    return user_schema.jsonify(user)
+
+@app.route('/', methods=['GET'])
 def test():
-    result = {'message':'hola como estas'}
-    return jsonify(result)
+    return 'hola como estas viejo'
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')

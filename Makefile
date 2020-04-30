@@ -16,7 +16,7 @@ build: ## Build the containers
 	$(COMPOSE_CMD) build
 
 up: ## Build and run the containers
-	$(COMPOSE_CMD) up -d --build
+	$(COMPOSE_CMD) up --build
 
 start: ## Spin up the project
 	$(COMPOSE_CMD) up -d
