@@ -2,14 +2,6 @@
 FROM python:3.8.1-slim-buster
 WORKDIR /app
 
-# flask envs
-ENV FLASK_APP=api.py
-ENV FLASK_ENV=development
-ENV DATABASE_URL=postgresql://chotuve:chotuve@db:5432/chotuve_auth_server
-ENV DATABASE=postgres
-ENV SQL_HOST=db
-ENV SQL_PORT=5432
-
 # install netcat to wait database server to start
 RUN apt-get update && apt-get install -y netcat
 
