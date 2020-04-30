@@ -1,15 +1,15 @@
 # base image with python 3
-FROM python:3
-
+FROM python:3.8.1-slim-buster
 WORKDIR /app
 
-# flask envs
-ENV FLASK_APP=api.py
-ENV FLASK_ENV=development
+# install netcat to wait database server to start
+RUN apt-get update && apt-get install -y netcat
 
 COPY ./requirements.txt .
 
 RUN pip install -r requirements.txt
+
+COPY ./docker-entrypoint-dev.sh .
 
 ENTRYPOINT ["sh", "/app/docker-entrypoint-dev.sh"]
 
