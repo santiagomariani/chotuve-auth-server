@@ -1,6 +1,6 @@
 # Chotuve - Auth Server
 
-![Grupo](https://img.shields.io/badge/grupo-11-blue) [![Build Status](https://travis-ci.com/santiagomariani/chotube-auth-server.svg?token=JK2YBuuGjqNcqiY3N6nH&branch=master)](https://travis-ci.com/github/santiagomariani/chotube-auth-server)
+![Grupo](https://img.shields.io/badge/grupo-11-blue) [![Build Status](https://travis-ci.com/santiagomariani/chotuve-auth-server.svg?token=JK2YBuuGjqNcqiY3N6nH&branch=master)](https://travis-ci.com/github/santiagomariani/chotuve-auth-server)
 ![api](https://img.shields.io/badge/api-v0.1-blueviolet)
 [![sv](https://img.shields.io/badge/view-app%20sv-important)](https://github.com/Franco-Giordano/chotuve-appserver)
 [![sv](https://img.shields.io/badge/view-media%20sv-important)](https://github.com/sebalogue/chotuve-mediaserver)
