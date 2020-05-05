@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
 from models.user import User, user_schema
-from app import db, auth
+from app import db
 from run import app
+from firebase import auth
 
 @app.route('/sign-up', methods=['POST'])
 def sign_up():
