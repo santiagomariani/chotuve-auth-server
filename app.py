@@ -1,25 +1,15 @@
-import time
 import os
 import pyrebase
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-
-# flask
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
-
-# Init app
-app = Flask(__name__)
-
-app.config.from_object("config.Config")
+from config import app_config 
 
 # databse
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 # Init ma
-ma = Marshmallow(app)
-
-# Set secret key
-#app.secret_key = b'\x0c{|7\x05\\t\xfe\xc8\x99\xc4r\xda\x82\xcd\x19\xf6\x18$\xca\xc2\xbc)\xe3'
+ma = Marshmallow()
 
 # Firebase configuration
 
@@ -37,5 +27,10 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-#if __name__ == '__main__':
-#    app.run(host='0.0.0.0')
+def create_app(config_name):
+    app = Flask(__name__)
+    app.config.from_object(app_config[config_name])
+    app.config.from_pyfile('config.py')
+    db.init_app(app)
+    ma.init_app(app)
+    return app

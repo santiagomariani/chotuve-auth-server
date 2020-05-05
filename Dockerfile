@@ -7,7 +7,8 @@ COPY . .
 RUN pip install -r requirements.txt
 
 # flask envs
-ENV FLASK_APP=api.py
+ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
+ENV APP_SETTINGS=production
 
 ENTRYPOINT ["sh", "/app/docker-entrypoint-prod.sh"]
