@@ -8,16 +8,11 @@ class User(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50))
     phone_number = db.Column(db.String(50))
-
-    def __init__(self, email, first_name, last_name, phone_number):
-        self.email = email
-        self.first_name = first_name
-        self.last_name = last_name
-        self.phone_number = phone_number
+    image_location = db.Column(db.String(2083))
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'email', 'first_name', 'last_name', 'phone_number')
+        fields = ('id', 'email', 'first_name', 'last_name', 'phone_number', 'image_location')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
