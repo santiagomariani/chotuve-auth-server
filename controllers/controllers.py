@@ -13,19 +13,33 @@ def sign_up():
     first_name = data['first_name']
     last_name = data['last_name']
     phone_number = data['phone_number']
+    image_location = data['image_location']
 
     #create user in firebase
     auth.create_user_with_email_and_password(email, password)
 
     #create user in my database
-    user = User(data['email'],
-        data['first_name'],
-        data['last_name'],
-        data['phone_number'])
+    user = User(email=email,
+        first_name=first_name,
+        last_name=last_name,
+        phone_number=phone_number,
+        image_location=image_location)
 
     db.session.add(user)
     db.session.commit()
     return user_schema.jsonify(user)
+
+@app.route('/sign-in', methods=['POST'])
+def sign_in():
+    data = request.json
+    
+    email = data['email']
+    password = data['password']
+    
+    #create user in firebase
+    user = auth.sign_in_with_email_and_password(email, password)
+    token = user['idToken']
+    return jsonify({'user-token': token})
 
 @app.route('/', methods=['GET'])
 def hello():
