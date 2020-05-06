@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
 from config import app_config 
-
+ 
 # databse
 db = SQLAlchemy()
 

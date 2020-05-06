@@ -9,7 +9,7 @@ from app import db
 def create_app():
   return app
 
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 manager = Manager(create_app)
 
 manager.add_command('db', MigrateCommand)
