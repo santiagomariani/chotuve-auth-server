@@ -41,6 +41,10 @@ def sign_in():
     token = user['idToken']
     return jsonify({'user-token': token})
 
+@app.route('/users/<id>', methods=['GET'])
+def get_user(id):
+    return 'hola'
+
 @app.route('/', methods=['GET'])
 def hello():
     return "hola flaco!"
