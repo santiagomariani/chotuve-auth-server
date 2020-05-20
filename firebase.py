@@ -12,5 +12,9 @@ config = {
     "appId": "1:662757364228:web:02d934f2819b5d58581b51"
 }
 
-firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
+import firebase_admin
+from firebase_admin import auth
+app = firebase_admin.initialize_app()
+
+# new configuration
+
