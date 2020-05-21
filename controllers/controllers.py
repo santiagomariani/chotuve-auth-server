@@ -6,57 +6,72 @@ from firebase import auth
 from functools import wraps
 import pdb 
 
-"""
+def check_token(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message': 'token is missing'}), 401
+
+        try:
+            auth.verify_id_token(token)
+        except (auth.ExpiredIdTokenError, ValueError):
+            return jsonify({'message': 'token is invalid'}), 401
+        except auth.RevokedIdTokenError:
+            return jsonify({'message': 'token has been revoked'}), 401
+        except auth.ExpiredIdTokenError:
+            return jsonify({'message': 'token has expired'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+def check_token_and_get_user(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message': 'token is missing'}), 401
+
+        try:
+            user_data = auth.verify_id_token(token)
+            user = User.query.filter_by(email=user_data['email']).first()
+        except (auth.ExpiredIdTokenError, ValueError):
+            return jsonify({'message': 'token is invalid'}), 401
+        except auth.RevokedIdTokenError:
+            return jsonify({'message': 'token has been revoked'}), 401
+        except auth.ExpiredIdTokenError:
+            return jsonify({'message': 'token has expired'}), 401
+        return f(user, *args, **kwargs)
+    return decorated
+
 @app.route('/sign-up', methods=['POST'])
+@check_token
 def sign_up():
+    # create user in auth server database.
     data = request.json
-    
-    email = data['email']
-    first_name = data['first_name']
-    last_name = data['last_name']
-    phone_number = data['phone_number']
-    image_location = data['image_location']
-
-    token = request.headers['x-access-token']
-    auth.verify_id_token(token)
-
-    #create user in firebase
-    auth.create_user_with_email_and_password(email, password)
-
-    #create user in my database
-    user = User(email=email,
-        first_name=first_name,
-        last_name=last_name,
-        phone_number=phone_number,
-        image_location=image_location)
-
+    user = User(email=data['email'],
+        display_name=data['display_name'],
+        phone_number=data['phone_number'],
+        image_location=data['image_location'],
+        admin=False)
     db.session.add(user)
     db.session.commit()
-    return user_schema.jsonify(user)
-
-"""
+    return jsonify({'message': 'ok'}), 200
 
 @app.route('/sign-in', methods=['POST'])
+@check_token
 def sign_in():
-    token = None
-
-    if 'x-access-token' in request.headers:
-        token = request.headers['x-access-token']
-
-    if not token:
-        return jsonify({'message': 'token is missing'}), 401
-
-    try:
-        auth.verify_id_token(token)
-    except (auth.ExpiredIdTokenError, ValueError):
-        return jsonify({'message': 'token is invalid'}), 401
-    except auth.RevokedIdTokenError:
-        return jsonify({'message': 'token has been revoked'}), 401
-    except auth.ExpiredIdTokenError:
-        return jsonify({'message': 'token has expired'})
-    return jsonify({'message': 'ok'})
+    return jsonify({'message': 'ok'}), 200
 
 """
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -75,13 +90,25 @@ def token_required(f):
 
         return f(current_user, *args, **kwargs)
     return decorated
-
-@app.route('/users/<id>', methods=['GET'])
-@token_required
-def get_user(current_user, id):
-    return user_schema.jsonify(current_user)
 """
 
-@app.route('/', methods=['GET'])
-def hello():
-    return "hola flaco!"
+@app.route('/users/<id>', methods=['GET'])
+@check_token
+def get_user(id):
+    user = User.query.filter_by(id=user_info['id']).first()
+    if not user:
+        return jsonify({'message' : 'user doesnt exist'}), 404
+    return user_schema.jsonify(user)
+
+@app.route('/users/<id>', methods=['PUT'])
+@check_token_and_get_user
+def modify_user(user, id):
+    if not user.admin:
+        if user.id != id:
+            return jsonify({'message': 'normal user cannot change other users data'}), 401 
+    data = request.json
+
+    if not user:
+        return jsonify({'message' : 'user doesnt exist'}), 404
+
+
