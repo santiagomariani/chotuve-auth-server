@@ -5,6 +5,11 @@ from run import app
 from firebase import auth
 from functools import wraps
 import pdb 
+import time
+
+def mock_verificar_token(token):
+    time.sleep(0.2)
+    return {'email': 'santiagomariani54645@gmail.com', 'uid': '52151515215'}
 
 def check_token(f):
     @wraps(f)
@@ -18,7 +23,8 @@ def check_token(f):
             return jsonify({'message': 'token is missing'}), 401
 
         try:
-            auth.verify_id_token(token)
+            mock_verificar_token(token)
+            #auth.verify_id_token(token)
         except (auth.ExpiredIdTokenError, ValueError):
             return jsonify({'message': 'token is invalid'}), 401
         except auth.RevokedIdTokenError:
@@ -40,7 +46,8 @@ def check_token_and_get_user(f):
             return jsonify({'message': 'token is missing'}), 401
 
         try:
-            user_data = auth.verify_id_token(token)
+            user_data = mock_verificar_token(token)
+            #user_data = auth.verify_id_token(token)
             user = User.query.filter_by(email=user_data['email']).first()
         except (auth.ExpiredIdTokenError, ValueError):
             return jsonify({'message': 'token is invalid'}), 401
@@ -56,6 +63,7 @@ def check_token_and_get_user(f):
 def sign_up():
     # create user in auth server database.
     data = request.json
+    print(data)
     user = User(email=data['email'],
         display_name=data['display_name'],
         phone_number=data['phone_number'],
@@ -70,45 +78,34 @@ def sign_up():
 def sign_in():
     return jsonify({'message': 'ok'}), 200
 
-"""
-
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
-
-        if not token:
-            return jsonify({'message' : 'Token is missing!'}), 401
-        try: 
-            user_info = auth.get_account_info(token)
-            pdb.set_trace()
-            current_user = User.query.filter_by(email=user_info['email']).first()
-        except:
-            return jsonify({'message' : 'Token is invalid!'}), 401
-
-        return f(current_user, *args, **kwargs)
-    return decorated
-"""
-
 @app.route('/users/<id>', methods=['GET'])
 @check_token
 def get_user(id):
-    user = User.query.filter_by(id=user_info['id']).first()
+    user = User.query.filter_by(id=id).first()
     if not user:
         return jsonify({'message' : 'user doesnt exist'}), 404
-    return user_schema.jsonify(user)
+    return user_schema.jsonify(user), 200
 
-@app.route('/users/<id>', methods=['PUT'])
+@app.route('/users/<int:id>', methods=['PUT'])
 @check_token_and_get_user
 def modify_user(user, id):
+    print(type(user))
+    print("ID")
+    print(user.id)
+    print(id)
     if not user.admin:
         if user.id != id:
             return jsonify({'message': 'normal user cannot change other users data'}), 401 
     data = request.json
 
-    if not user:
-        return jsonify({'message' : 'user doesnt exist'}), 404
-
+    if 'email' in data:
+        user.email = data['email']
+    if 'display_name' in data:
+        user.display_name = data['display_name']
+    if 'image_location' in data:
+        user.image_location = data['image_location']
+    if 'phone_number' in data:
+        user.phone_number = data['phone_number']
+    
+    return user_schema.jsonify(user), 200
 
