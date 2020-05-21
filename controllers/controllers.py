@@ -9,7 +9,11 @@ import time
 
 def mock_verificar_token(token):
     time.sleep(0.2)
-    return {'email': 'santiagomariani54645@gmail.com', 'uid': '52151515215'}
+    #raise auth.ExpiredIdTokenError("hola","chau")
+    #raise auth.RevokedIdTokenError("hola")
+    #raise ValueError
+    raise auth.InvalidIdTokenError("hola")
+    return {'email': 'santiagofernandez@gmail.com', 'uid': '52151515215'}
 
 def check_token(f):
     @wraps(f)
@@ -25,12 +29,12 @@ def check_token(f):
         try:
             mock_verificar_token(token)
             #auth.verify_id_token(token)
-        except (auth.ExpiredIdTokenError, ValueError):
-            return jsonify({'message': 'token is invalid'}), 401
         except auth.RevokedIdTokenError:
             return jsonify({'message': 'token has been revoked'}), 401
         except auth.ExpiredIdTokenError:
             return jsonify({'message': 'token has expired'}), 401
+        except (auth.InvalidIdTokenError, ValueError):
+            return jsonify({'message': 'token is invalid'}), 401
         return f(*args, **kwargs)
     return decorated
 
@@ -46,16 +50,15 @@ def check_token_and_get_user(f):
             return jsonify({'message': 'token is missing'}), 401
 
         try:
-            user_data = mock_verificar_token(token)
-            #user_data = auth.verify_id_token(token)
-            user = User.query.filter_by(email=user_data['email']).first()
-        except (auth.ExpiredIdTokenError, ValueError):
-            return jsonify({'message': 'token is invalid'}), 401
+            mock_verificar_token(token)
+            #auth.verify_id_token(token)
         except auth.RevokedIdTokenError:
             return jsonify({'message': 'token has been revoked'}), 401
         except auth.ExpiredIdTokenError:
             return jsonify({'message': 'token has expired'}), 401
-        return f(user, *args, **kwargs)
+        except (auth.InvalidIdTokenError, ValueError):
+            return jsonify({'message': 'token is invalid'}), 401
+        return f(*args, **kwargs)
     return decorated
 
 @app.route('/sign-up', methods=['POST'])
