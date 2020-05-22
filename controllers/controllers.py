@@ -1,18 +1,20 @@
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
-from models.user import User, user_schema
+from models.models import User, user_schema, ResetCode
 from app import db
 from run import app
 from firebase import auth
 from functools import wraps
 import pdb 
 import time
+import secrets
+from services.email_sender import EmailSender
 
 def mock_verificar_token(token):
     time.sleep(0.2)
     #raise auth.ExpiredIdTokenError("hola","chau")
     #raise auth.RevokedIdTokenError("hola")
     #raise ValueError
-    raise auth.InvalidIdTokenError("hola")
+    #raise auth.InvalidIdTokenError("hola")
     return {'email': 'santiagofernandez@gmail.com', 'uid': '52151515215'}
 
 def check_token(f):
@@ -110,5 +112,33 @@ def modify_user(user, id):
     if 'phone_number' in data:
         user.phone_number = data['phone_number']
     
+    db.session.commit() 
     return user_schema.jsonify(user), 200
+
+@app.route('/reset-codes', methods=['POST'])
+def create_reset_code():
+    data = request.json
+    if ('email' not in data):
+        return jsonify({'message': 'must send email'}), 400
+
+    email = data['email']
+    user = User.query.filter_by(email=email).first()
+    
+    if (not user):
+        return jsonify({'message': 'user doesnt exist'}), 404
+    
+    code = secrets.token_urlsafe(4)
+    reset_code = ResetCode(code=code,user=user)
+
+    db.session.add(reset_code)
+    db.session.commit()
+
+    email_sender = EmailSender(email)
+    email_sender.send_reset_password_email(code)
+    return jsonify({'message': 'ok'}), 200
+
+
+
+
+
 
