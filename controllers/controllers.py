@@ -26,17 +26,17 @@ def check_token(f):
             token = request.headers['x-access-token']
 
         if not token:
-            return jsonify({'message': 'token is missing'}), 401
+            return jsonify({'message': 'token is missing.'}), 401
 
         try:
-            mock_verificar_token(token)
-            #auth.verify_id_token(token)
+            #mock_verificar_token(token)
+            auth.verify_id_token(token)
         except auth.RevokedIdTokenError:
-            return jsonify({'message': 'token has been revoked'}), 401
+            return jsonify({'message': 'token has been revoked.'}), 401
         except auth.ExpiredIdTokenError:
-            return jsonify({'message': 'token has expired'}), 401
+            return jsonify({'message': 'token has expired.'}), 401
         except (auth.InvalidIdTokenError, ValueError):
-            return jsonify({'message': 'token is invalid'}), 401
+            return jsonify({'message': 'token is invalid.'}), 401
         return f(*args, **kwargs)
     return decorated
 
@@ -49,17 +49,17 @@ def check_token_and_get_user(f):
             token = request.headers['x-access-token']
 
         if not token:
-            return jsonify({'message': 'token is missing'}), 401
+            return jsonify({'message': 'token is missing.'}), 401
 
         try:
-            mock_verificar_token(token)
-            #auth.verify_id_token(token)
+            #mock_verificar_token(token)
+            auth.verify_id_token(token)
         except auth.RevokedIdTokenError:
-            return jsonify({'message': 'token has been revoked'}), 401
+            return jsonify({'message': 'token has been revoked.'}), 401
         except auth.ExpiredIdTokenError:
-            return jsonify({'message': 'token has expired'}), 401
+            return jsonify({'message': 'token has expired.'}), 401
         except (auth.InvalidIdTokenError, ValueError):
-            return jsonify({'message': 'token is invalid'}), 401
+            return jsonify({'message': 'token is invalid.'}), 401
         return f(*args, **kwargs)
     return decorated
 
@@ -88,7 +88,7 @@ def sign_in():
 def get_user(id):
     user = User.query.filter_by(id=id).first()
     if not user:
-        return jsonify({'message' : 'user doesnt exist'}), 404
+        return jsonify({'message' : 'user doesnt exist.'}), 404
     return user_schema.jsonify(user), 200
 
 @app.route('/users/<int:id>', methods=['PUT'])
@@ -100,7 +100,7 @@ def modify_user(user, id):
     print(id)
     if not user.admin:
         if user.id != id:
-            return jsonify({'message': 'normal user cannot change other users data'}), 401 
+            return jsonify({'message': 'normal user cannot change other users data.'}), 401 
     data = request.json
 
     if 'email' in data:
@@ -119,13 +119,13 @@ def modify_user(user, id):
 def create_reset_code():
     data = request.json
     if ('email' not in data):
-        return jsonify({'message': 'must send email'}), 400
+        return jsonify({'message': 'must send email.'}), 400
 
     email = data['email']
     user = User.query.filter_by(email=email).first()
     
     if (not user):
-        return jsonify({'message': 'user doesnt exist'}), 404
+        return jsonify({'message': 'user does not exist.'}), 404
     
     code = secrets.token_urlsafe(4)
     reset_code = ResetCode(code=code,user=user)
@@ -137,7 +137,50 @@ def create_reset_code():
     email_sender.send_reset_password_email(code)
     return jsonify({'message': 'ok'}), 200
 
+@app.route('/change-password-with-reset-code', methods=['POST'])
+def validate_reset_code():
+    data = request.json
 
+    if ('password' not in data):
+        return jsonify({'message': 'must send password.'}), 400
+
+    if ('code' not in data):
+        return jsonify({'message': 'must send reset code.'}), 400
+
+    if ('email' not in data):
+        return jsonify({'message': 'must send email.'}), 400
+
+    password = data['password']
+    code = data['code']
+    email = data['email']
+
+    reset_code = ResetCode.query.filter_by(code=code).first()
+
+    if (not reset_code):
+        return jsonify({'message': 'reset code does not exist.'}), 401
+
+    user = reset_code.user
+
+    if (reset_code.has_expired()):
+        return jsonify({'message': 'reset code has expired.'}), 401
+
+    if(user.email != email):
+        return jsonify({'message': 'reset code does not belong to the email sent.'}), 401
+
+    user_data = auth.get_user_by_email(user.email)
+    uid = user_data.uid
+    auth.update_user(uid, password=password)
+
+    db.session.delete(reset_code)
+    db.session.commit()
+    
+    return jsonify({'message': 'ok'}), 200
+
+
+
+
+
+    
 
 
 

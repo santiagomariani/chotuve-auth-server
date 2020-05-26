@@ -10,5 +10,6 @@ RUN pip install -r requirements.txt
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 ENV APP_SETTINGS=production
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/chotuve-videos-firebase-adminsdk.json
 
 ENTRYPOINT ["sh", "/app/docker-entrypoint-prod.sh"]

@@ -1,5 +1,5 @@
 from app import db, ma
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # User
 class User(db.Model):
@@ -24,7 +24,12 @@ users_schema = UserSchema(many=True)
 class ResetCode(db.Model):
     __tablename__ = "reset_code"
 
+    EXPIRATION_TIME_IN_MINUTES = 10
+
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(6), unique=True, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow())
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), unique=True)
+
+    def has_expired(self):
+        return datetime.utcnow() > (self.timestamp + timedelta(minutes=self.EXPIRATION_TIME_IN_MINUTES))
