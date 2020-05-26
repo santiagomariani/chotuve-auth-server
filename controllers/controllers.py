@@ -99,17 +99,22 @@ def modify_user(user, id):
             return jsonify({'message': 'normal user cannot change other users data.'}), 401 
     data = request.json
 
+    user_to_modify = User.query.filter_by(id=id).first()
+
+    if not user_to_modify:
+        return jsonify({'message' : 'user doesnt exist.'}), 404
+
     if 'email' in data:
-        user.email = data['email']
+        user_to_modify.email = data['email']
     if 'display_name' in data:
-        user.display_name = data['display_name']
+        user_to_modify.display_name = data['display_name']
     if 'image_location' in data:
-        user.image_location = data['image_location']
+        user_to_modify.image_location = data['image_location']
     if 'phone_number' in data:
-        user.phone_number = data['phone_number']
+        user_to_modify.phone_number = data['phone_number']
     
     db.session.commit() 
-    return user_schema.jsonify(user), 200
+    return jsonify({'message': 'ok'}), 200
 
 @app.route('/reset-codes', methods=['POST'])
 def create_reset_code():
