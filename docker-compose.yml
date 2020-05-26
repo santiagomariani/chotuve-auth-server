@@ -8,11 +8,13 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile.development
-        #restart: always
+        restart: always
         ports:
         - "4000:5000" 
         volumes:
         - ./:/app
+        - /app/postgres_data/
+
         env_file:
             - ./.env.dev
     db:
