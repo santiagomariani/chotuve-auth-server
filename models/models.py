@@ -24,7 +24,7 @@ users_schema = UserSchema(many=True)
 class ResetCode(db.Model):
     __tablename__ = "reset_code"
 
-    EXPIRATION_TIME_IN_MINUTES = 10
+    EXPIRATION_TIME_IN_MINUTES = 15
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(6), unique=True, nullable=False)
