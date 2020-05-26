@@ -49,18 +49,19 @@ def check_token_and_get_user(f):
             token = request.headers['x-access-token']
 
         if not token:
-            return jsonify({'message': 'token is missing.'}), 401
+            return jsonify({'message': 'token is missing'}), 401
 
         try:
-            #mock_verificar_token(token)
-            auth.verify_id_token(token)
+            #user_data = mock_verificar_token(token)
+            user_data = auth.verify_id_token(token)
+            user = User.query.filter_by(email=user_data['email']).first()
+        except (auth.ExpiredIdTokenError, ValueError):
+            return jsonify({'message': 'token is invalid'}), 401
         except auth.RevokedIdTokenError:
-            return jsonify({'message': 'token has been revoked.'}), 401
+            return jsonify({'message': 'token has been revoked'}), 401
         except auth.ExpiredIdTokenError:
-            return jsonify({'message': 'token has expired.'}), 401
-        except (auth.InvalidIdTokenError, ValueError):
-            return jsonify({'message': 'token is invalid.'}), 401
-        return f(*args, **kwargs)
+            return jsonify({'message': 'token has expired'}), 401
+        return f(user, *args, **kwargs)
     return decorated
 
 @app.route('/sign-up', methods=['POST'])
@@ -68,7 +69,6 @@ def check_token_and_get_user(f):
 def sign_up():
     # create user in auth server database.
     data = request.json
-    print(data)
     user = User(email=data['email'],
         display_name=data['display_name'],
         phone_number=data['phone_number'],
@@ -94,10 +94,6 @@ def get_user(id):
 @app.route('/users/<int:id>', methods=['PUT'])
 @check_token_and_get_user
 def modify_user(user, id):
-    print(type(user))
-    print("ID")
-    print(user.id)
-    print(id)
     if not user.admin:
         if user.id != id:
             return jsonify({'message': 'normal user cannot change other users data.'}), 401 
