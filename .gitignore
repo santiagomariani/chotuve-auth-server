@@ -1,5 +1,5 @@
 __pycache__/
-migrations
+migrations/
 .pytest_cache
 postgres_data/
 .vscode/
