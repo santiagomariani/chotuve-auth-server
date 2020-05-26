@@ -18,14 +18,14 @@ script:
 - docker exec -it chotuve-auth-server pytest
 deploy:
   # deploy to production environment
-  provider: script
-  script: docker tag chotuve-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web; docker push santiagomariani/chotuve-auth-server; docker push registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web;
-    heroku container:release web --app $HEROKU_AUTHSERVER_APP_NAME
-  on:
-    branch: master
+  - provider: script
+    script: docker tag chotuve-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web; docker push santiagomariani/chotuve-auth-server; docker push registry.heroku.com/$HEROKU_AUTHSERVER_APP_NAME/web;
+      heroku container:release web --app $HEROKU_AUTHSERVER_APP_NAME
+    on:
+      branch: master
   # deploy to staging environment
-  provider: script
-  script: docker tag chotuve-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_STAGING_APP_NAME/web; docker push santiagomariani/chotuve-auth-server-staging; docker push registry.heroku.com/$HEROKU_AUTHSERVER_STAGING_APP_NAME/web;
-  heroku container:release web --app $HEROKU_AUTHSERVER_STAGING_APP_NAME
-  on:
-    branch: staging
+  - provider: script
+    script: docker tag chotuve-auth-server registry.heroku.com/$HEROKU_AUTHSERVER_STAGING_APP_NAME/web; docker push santiagomariani/chotuve-auth-server-staging; docker push registry.heroku.com/$HEROKU_AUTHSERVER_STAGING_APP_NAME/web;
+    heroku container:release web --app $HEROKU_AUTHSERVER_STAGING_APP_NAME
+    on:
+      branch: staging
