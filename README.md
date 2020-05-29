@@ -80,3 +80,4 @@ Todos los endpoints en negrita deben recibir el token id (otorgado por firebase)
 	
 }
 ```
+
