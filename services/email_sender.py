@@ -22,7 +22,7 @@ class EmailSender():
         {}
         Si no has solicitado este cambio, ignora este correo electrónico.
         Gracias,
-        El equipo de Chotuve.
+        El equipo de Chotuve Videos.
         """.format(code)
 
         # html version

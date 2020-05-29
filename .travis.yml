@@ -4,6 +4,9 @@ python:
 - '3.6'
 services:
 - docker
+
+if: commit_message !~ /(no-ci|wip)/
+
 before_install:
 - openssl aes-256-cbc -K $encrypted_112adfae4771_key -iv $encrypted_112adfae4771_iv
   -in chotuve-videos-firebase-adminsdk.json.enc -out chotuve-videos-firebase-adminsdk.json
