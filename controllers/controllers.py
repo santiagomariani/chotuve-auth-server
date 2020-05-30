@@ -1,14 +1,39 @@
-from flask import Flask, jsonify, request, session, redirect, url_for, make_response
-from models.models import User, user_schema, ResetCode
-from app import db
-from run import app
-from firebase import auth
-from functools import wraps
-import pdb 
-import time
-import secrets
-from services.email_sender import EmailSender
+#import pdb 
 
+#from flask import Flask, jsonify, request, session, redirect, url_for, make_response
+
+from utils.decorators import check_token, check_token_and_get_user
+from resources.users_routes import UsersRoutes, UniqueUserRoutes, UserIdFromTokenRoute
+from resources.reset_codes import ResetCodesRoutes, ChangePasswordRoutes
+from app import api
+from run import app
+
+api.add_resource(UsersRoutes, '/users')
+api.add_resource(UniqueUserRoutes, '/users/<int:user_id>')
+api.add_resource(UserIdFromTokenRoute, '/users/id')
+
+api.add_resource(ResetCodesRoutes, '/reset-codes')
+api.add_resource(ChangePasswordRoutes, '/change-password-with-reset-code')
+
+
+@app.route('/ping')
+def ping():
+    return jsonify({'message': 'ok'}), 200
+
+"""
+@app.route('/users-test', methods=['POST'])
+def create_user_delete_this():
+    user = User(display_name="Sebastian Perez",
+                email="sebastianperez@gmail.com",
+                phone_number="2254450852",
+                image_location="http://www.google.com.ar/imagen.jpeg")
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'message': 'ok'}), 200
+"""
+#-----------------------------------------------------
+
+"""
 def mock_verificar_token(token):
     time.sleep(0.2)
     #raise auth.ExpiredIdTokenError("hola","chau")
@@ -64,7 +89,8 @@ def check_token_and_get_user(f):
         return f(user, *args, **kwargs)
     return decorated
 
-@app.route('/sign-up', methods=['POST'])
+
+@app.route('/users', methods=['POST'])
 @check_token
 def sign_up():
     # create user in auth server database.
@@ -77,12 +103,12 @@ def sign_up():
     db.session.add(user)
     db.session.commit()
     return jsonify({'message': 'ok'}), 200
-
+"""
 @app.route('/sign-in', methods=['POST'])
 @check_token
 def sign_in():
     return jsonify({'message': 'ok'}), 200
-
+"""
 @app.route('/users/<id>', methods=['GET'])
 @check_token
 def get_user(id):
@@ -176,7 +202,7 @@ def validate_reset_code():
     db.session.commit()
     
     return jsonify({'message': 'ok'}), 200
-
+"""
 
 
 
