@@ -1,19 +1,18 @@
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
 
 class EmailSender():
+    # refactor this to get credentials from some safe place.
+    _SENDER_EMAIL = "chotuvevideos@gmail.com"
+    _PASSWORD = "Lamejorappgrupo8"
 
-    def __init__(self, receiver_email):
-        self.receiver_email = receiver_email
-        self.sender_email = "chotuvevideos@gmail.com"
-        self.password = "Lamejorappgrupo8"
-
-    def send_reset_password_email(self, code):
+    def send_reset_password_email(self, receiver_email, code):
         message = MIMEMultipart("alternative")
         message["Subject"] = "Recuperar contraseña de Chotuve"
-        message["From"] = self.sender_email
-        message["To"] = self.receiver_email
+        message["From"] = self._SENDER_EMAIL 
+        message["To"] = receiver_email
 
         # plain text version
         text = """\
@@ -51,7 +50,14 @@ class EmailSender():
         # Create secure connection with server and send email
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(self.sender_email, self.password)
+            server.login(self._SENDER_EMAIL, self._PASSWORD)
             server.sendmail(
-                self.sender_email, self.receiver_email, message.as_string()
+                self._SENDER_EMAIL, receiver_email, message.as_string()
             )
+
+class EmailSenderFake():
+
+    def send_reset_password_email(self, receiver_email, code):
+        True
+
+email_sender_service = EmailSender() if os.environ['APP_SETTINGS'] != 'development' else EmailSenderFake()

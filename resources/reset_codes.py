@@ -1,7 +1,7 @@
 from flask_restful import reqparse, Resource
 from models.models import ResetCode, User
 from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
-from services.email_sender import EmailSender
+from services.email_sender import email_sender_service
 from services.authentication import auth_service
 from app import db
 import secrets
@@ -31,8 +31,7 @@ class ResetCodesRoutes(Resource):
         db.session.add(reset_code)
         db.session.commit()
 
-        email_sender = EmailSender(email)
-        email_sender.send_reset_password_email(code)
+        email_sender_service.send_reset_password_email(email, code)
 
         return {'message': 'ok'}, 200    
 

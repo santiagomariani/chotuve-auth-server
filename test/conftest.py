@@ -21,7 +21,7 @@ def testapp(flask_app):
 from controllers import controllers
 from handlers import *
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope='session', autouse=True)
 def db_handle(flask_app):
     db_fd, db_fname = tempfile.mkstemp()
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
