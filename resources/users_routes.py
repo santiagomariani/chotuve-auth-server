@@ -55,7 +55,7 @@ class UniqueUserRoutes(Resource):
         return user_schema.jsonify(user), 200
         
     @check_token_and_get_user
-    def put(self, user, user_id):
+    def put(user, self, user_id):
 
         parser = reqparse.RequestParser()
 
@@ -65,6 +65,8 @@ class UniqueUserRoutes(Resource):
         parser.add_argument("image_location", location="json", required=False, type=str)
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
         
+        args = parser.parse_args()
+
         if not user.admin:
             if user.id != user_id:
                 raise UserUnauthorizedError(f"User with ID: {user_id} cannot change other user's data. ")
@@ -85,3 +87,16 @@ class UniqueUserRoutes(Resource):
         
         db.session.commit() 
         return {'message': 'ok'}, 200
+
+#/users/id
+class UserIdFromTokenRoute(Resource):
+    def __init__(self):
+        super(UserIdFromTokenRoute, self).__init__()
+
+    @check_token_and_get_user
+    def get(user, self):
+        print(type(user))
+        parser = reqparse.RequestParser()
+        parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
+        args = parser.parse_args()
+        return {'uid': user.id}

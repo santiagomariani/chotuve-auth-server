@@ -22,7 +22,7 @@ def test_register_user_success(testapp):
     """Register a user with a valid token and data"""
     response = testapp.post('/users', json={'email':'santiagomariani2@gmail.com',
                                             'display_name': 'Santiago Mariani',
-                                            'phone_number': '2254405503',
+                                            'phone_number': '2267458826',
                                             'image_location': 'http://www.google.coma.ar'}
                                     , headers={'x-access-token': token})
     json_data = response.get_json()
@@ -35,3 +35,13 @@ def test_reset_code_success(testapp):
     json_data = response.get_json()
     assert json_data['message'] == 'ok'                                       
     assert response.status_code == 200
+
+def test_get_uid_from_token(testapp):
+    """Should return uid just sending the token."""
+    response = testapp.get('/users/id',
+                            headers={'x-access-token': token})
+    json_data = response.get_json()
+    assert json_data['uid'] == 1
+    assert response.status_code == 200
+
+
