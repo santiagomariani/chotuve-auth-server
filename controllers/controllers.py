@@ -1,24 +1,12 @@
-from models.models import User, user_schema, ResetCode
-from app import db
-from firebase import auth
-from functools import wraps
-import pdb 
-import time
-import secrets
+#import pdb 
+
+#from flask import Flask, jsonify, request, session, redirect, url_for, make_response
+
 from utils.decorators import check_token, check_token_and_get_user
-from services.email_sender import EmailSender
-
-
-from flask import Flask, jsonify, request, session, redirect, url_for, make_response
-from flask_restful import Api
-from run import app
-
-
 from resources.users_routes import UsersRoutes, UniqueUserRoutes
 from resources.reset_codes import ResetCodesRoutes, ChangePasswordRoutes
-
-api = Api(app)
-
+from app import api
+from run import app
 
 api.add_resource(UsersRoutes, '/users')
 api.add_resource(UniqueUserRoutes, '/users/<int:user_id>')
@@ -26,6 +14,21 @@ api.add_resource(UniqueUserRoutes, '/users/<int:user_id>')
 api.add_resource(ResetCodesRoutes, '/reset-codes')
 api.add_resource(ChangePasswordRoutes, '/change-password-with-reset-code')
 
+@app.route('/ping')
+def ping():
+    return jsonify({'message': 'ok'}), 200
+
+"""
+@app.route('/users-test', methods=['POST'])
+def create_user_delete_this():
+    user = User(display_name="Sebastian Perez",
+                email="sebastianperez@gmail.com",
+                phone_number="2254450852",
+                image_location="http://www.google.com.ar/imagen.jpeg")
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'message': 'ok'}), 200
+"""
 #-----------------------------------------------------
 
 """

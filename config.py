@@ -5,11 +5,17 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
+    WTF_CSRF_ENABLED = True
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     LOG_LEVEL = "DEBUG"
+
+class TestConfig(Config):
+    DEBUG = False
+    TESTING = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -17,5 +23,6 @@ class ProductionConfig(Config):
 
 app_config = {
     'development': DevelopmentConfig,
-    'production': ProductionConfig
+    'production': ProductionConfig,
+    'testing': TestConfig
 }
