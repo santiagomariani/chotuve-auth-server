@@ -2,10 +2,9 @@ from flask_restful import reqparse, Resource
 from models.models import ResetCode, User
 from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
 from services.email_sender import EmailSender
+from services.authentication import auth_service
 from app import db
 import secrets
-from firebase import auth
-
 
 #/reset-codes
 class ResetCodesRoutes(Resource):
@@ -69,9 +68,7 @@ class ChangePasswordRoutes(Resource):
         if(user.email != email):
             raise UserUnauthorizedError(f"Reset code does not belong to the email sent.")
 
-        user_data = auth.get_user_by_email(user.email)
-        uid = user_data.uid
-        auth.update_user(uid, password=password)
+        auth_service.update_password(email, password)
 
         db.session.delete(reset_code)
         db.session.commit()

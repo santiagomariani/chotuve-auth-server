@@ -16,7 +16,6 @@ def flask_app():
 
 @pytest.fixture(scope='session')
 def testapp(flask_app):
-    print(type(flask_app.test_client()))
     return flask_app.test_client()
 
 from controllers import controllers
