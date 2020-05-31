@@ -18,15 +18,11 @@ def flask_app():
 def testapp(flask_app):
     return flask_app.test_client()
 
-from controllers import controllers
-from handlers import *
-
 @pytest.fixture(scope='session', autouse=True)
 def db_handle(flask_app):
     db_fd, db_fname = tempfile.mkstemp()
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
     
-    db.init_app(flask_app)
     db.create_all()
        
     yield db
