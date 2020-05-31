@@ -15,12 +15,16 @@ ma = Marshmallow()
 # Flask restful 
 api = Api()
 
+from resources import add_routes
+
 @failsafe
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
     app.config['BUNDLE_ERRORS'] = True
+
+    add_routes(api)
 
     api.init_app(app)
     db.init_app(app)

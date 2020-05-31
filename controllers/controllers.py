@@ -1,20 +1,10 @@
 #import pdb 
 
-#from flask import Flask, jsonify, request, session, redirect, url_for, make_response
+from flask import Flask, jsonify, request, session, redirect, url_for, make_response
 
 from utils.decorators import check_token, check_token_and_get_user
-from resources.users_routes import UsersRoutes, UniqueUserRoutes, UserIdFromTokenRoute
-from resources.reset_codes import ResetCodesRoutes, ChangePasswordRoutes
-from app import api
+
 from run import app
-
-api.add_resource(UsersRoutes, '/users')
-api.add_resource(UniqueUserRoutes, '/users/<int:user_id>')
-api.add_resource(UserIdFromTokenRoute, '/users/id')
-
-api.add_resource(ResetCodesRoutes, '/reset-codes')
-api.add_resource(ChangePasswordRoutes, '/change-password-with-reset-code')
-
 
 @app.route('/ping')
 def ping():
