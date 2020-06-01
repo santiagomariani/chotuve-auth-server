@@ -17,30 +17,32 @@ def test_simple_ping(db_handle, testapp):
 """
 
 token = 'WlxyCjKBDOfjJAbW800G57o4eBIpe3nJwTiPrJJgeTnTX0RPzc0XxZkG0y2QGkJOr9Pu3V8unfkp0xhFx9b802G3gPsJ150USj1T0C9Nvi1Gy4GRz3FyaBgPoPXg'
+user_data = {'email':'santiagomariani2@gmail.com',
+            'display_name': 'Santiago Mariani',
+            'phone_number': '2267458826',
+            'image_location': 'http://www.google.com.ar'}
+# POST /users
 
 def test_register_user(testapp):
     """Register a user with a valid token and data."""
     # This test creates a user that is used in the other tests.
-    response = testapp.post('/users', json={'email':'santiagomariani2@gmail.com',
-                                            'display_name': 'Santiago Mariani',
-                                            'phone_number': '2267458826',
-                                            'image_location': 'http://www.google.com.ar'}
+    response = testapp.post('/users', json=user_data
                                     , headers={'x-access-token': token})
     json_data = response.get_json()
     assert json_data['message'] == 'ok'
     assert response.status_code == 200
 
-#/users/<int:id>
+# GET /users/<int:id>
 
 def test_get_user_data_with_id(testapp):
     """Should return user data if user id and token is valid."""
     response = testapp.get('/users/1', headers={'x-access-token': token})
     json_data = response.get_json()
-
-    assert json_data['email'] == 'santiagomariani2@gmail.com'
-    assert json_data['display_name'] == 'Santiago Mariani'
-    assert json_data['phone_number'] == '2267458826'
-    assert json_data['image_location'] == 'http://www.google.com.ar'
+    
+    result_data = user_data.copy()
+    result_data["id"] = 1
+    
+    assert json_data == result_data
     assert response.status_code == 200
 
 def test_get_user_data_of_user_that_does_not_exist(testapp):
@@ -49,7 +51,34 @@ def test_get_user_data_of_user_that_does_not_exist(testapp):
     json_data = response.get_json()
 
     assert json_data['message'] == 'No user found with ID: 2'
-    assert response.status_code == 404   
+    assert response.status_code == 404  
+
+# PUT /users/<int:id>
+
+def test_modify_user_data_with_id(testapp):
+    """Should modify user data if user id and token is valid."""
+    
+    new_data = {'email':'santiagomariani2@gmail.com',
+                'display_name': 'Santiago Tomas Mariani',
+                'phone_number': '2254444444',
+                'image_location': 'http://www.facebook.com'}
+    
+    response = testapp.put('/users/1', json=new_data
+                                    , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+    
+    assert json_data['message'] == 'ok'
+    assert response.status_code == 200
+
+    # check if data has changed
+
+    response = testapp.get('/users/1', headers={'x-access-token': token})
+    json_data = response.get_json()
+    new_data["id"] = 1
+    assert json_data == new_data
+
+
+# POST /reset-codes
 
 def test_reset_code(testapp):
     """Get a reset code with a valid email (a user with that email exist)."""
