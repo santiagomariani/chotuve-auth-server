@@ -5,7 +5,8 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
-    WTF_CSRF_ENABLED = True
+    BUNDLE_ERRORS = True
+    PROPAGATE_EXCEPTIONS = True
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
@@ -20,7 +21,6 @@ class TestConfig(Config):
     WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
-    DEBUG = False
     LOG_LEVEL = "WARN"
 
 app_config = {
@@ -28,3 +28,4 @@ app_config = {
     'production': ProductionConfig,
     'testing': TestConfig
 }
+
