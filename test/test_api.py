@@ -2,20 +2,6 @@ import pytest
 from test.conftest import *
 from models.models import User
 
-"""
-def test_simple_ping(db_handle, testapp):
-    user = User(email="santiagomariani2@gmail.com",
-                display_name="Santiago Mariani",
-                phone_number="2254405503",
-                image_location="http://www.google.com.ar",
-                admin=False)
-    db_handle.session.add(user)
-    db_handle.session.commit()
-    response = testapp.post('/reset-codes', json={'email':"santiagomariani2@gmail.com"})
-    print(response.data)
-    assert response.status_code == 200
-"""
-
 token = 'WlxyCjKBDOfjJAbW800G57o4eBIpe3nJwTiPrJJgeTnTX0RPzc0XxZkG0y2QGkJOr9Pu3V8unfkp0xhFx9b802G3gPsJ150USj1T0C9Nvi1Gy4GRz3FyaBgPoPXg'
 user_data = {'email':'santiagomariani2@gmail.com',
             'display_name': 'Santiago Mariani',
@@ -77,7 +63,6 @@ def test_modify_user_data_with_id(testapp):
     new_data["id"] = 1
     assert json_data == new_data
 
-
 # POST /reset-codes
 
 def test_reset_code(testapp):
@@ -86,4 +71,14 @@ def test_reset_code(testapp):
     json_data = response.get_json()
     assert json_data['message'] == 'ok'                                       
     assert response.status_code == 200
+
+# GET /users/id
+
+def test_get_uid_from_token(testapp):
+    """Should return uid just sending the token."""
+    response = testapp.get('/users/id',
+                            headers={'x-access-token': token})
+    json_data = response.get_json()
+    assert json_data['uid'] == 1
+    assert response.status_code == 200    
 
