@@ -7,23 +7,22 @@ class AuthenticationFirebase():
 
     def __init__(self):
         self.firebase_app = firebase_admin.initialize_app()
-        self.auth = auth
 
     def verify_id_token(self, token):
         try:
-            user_data = self.auth.verify_id_token(token)
-        except self.auth.RevokedIdTokenError:
+            user_data = auth.verify_id_token(token)
+        except auth.RevokedIdTokenError:
             raise UserUnauthorizedError(f"Token has been revoked.")
-        except self.auth.ExpiredIdTokenError:
+        except auth.ExpiredIdTokenError:
             raise UserUnauthorizedError(f"Token has expired.")
-        except (self.auth.InvalidIdTokenError, ValueError):
+        except (auth.InvalidIdTokenError, ValueError):
             raise UserUnauthorizedError(f"Token is invalid.")
         return user_data
 
     def update_password(self, email, password):
         user_data = auth.get_user_by_email(email)
         uid = user_data.uid
-        self.auth.update_user(uid, password=password)
+        auth.update_user(uid, password=password)
 
 
 class AuthenticationFake():
@@ -49,11 +48,22 @@ class AuthenticationFake():
 
     def setExpiredToken(self):
         self.expiredToken = True
+        self.revokedToken = False
+        self.invalidToken = False
 
     def setRevokedToken(self):
         self.revokedToken = True
+        self.expiredToken = False
+        self.invalidToken = False
     
     def setInvalidToken(self):
         self.invalidToken = True
+        self.expiredToken = False
+        self.revokedToken = False
+
+    def setValidToken(self):
+        self.invalidToken = False
+        self.expiredToken = False
+        self.revokedToken = False
 
 auth_service = AuthenticationFirebase() if os.environ['APP_SETTINGS'] != 'development' else AuthenticationFake()
