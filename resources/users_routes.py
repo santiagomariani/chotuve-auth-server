@@ -1,4 +1,5 @@
 from flask_restful import reqparse, Resource
+from flask import make_response
 from utils.decorators import check_token, check_token_and_get_user
 from app import db
 from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
@@ -31,7 +32,7 @@ class UsersRoutes(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return {'message': 'ok'}, 200
+        return make_response({'message': 'ok'}, 200)
 
 
 #/users/<int:user_id>
@@ -52,7 +53,7 @@ class UniqueUserRoutes(Resource):
         
         if not user:
             raise UserNotFoundError(f"No user found with ID: {user_id}")
-        return user_schema.jsonify(user), 200
+        return make_response(user_schema.jsonify(user), 200)
         
     @check_token_and_get_user
     def put(user, self, user_id):
@@ -86,7 +87,7 @@ class UniqueUserRoutes(Resource):
             user_to_modify.phone_number = args['phone_number']
         
         db.session.commit() 
-        return {'message': 'ok'}, 200
+        return make_response({'message': 'ok'}, 200)
 
 #/users/id
 class UserIdFromTokenRoute(Resource):
@@ -99,4 +100,4 @@ class UserIdFromTokenRoute(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
         args = parser.parse_args()
-        return {'uid': user.id}
+        return make_response({'uid': user.id}, 200)

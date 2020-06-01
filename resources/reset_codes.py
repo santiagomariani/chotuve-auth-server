@@ -3,6 +3,7 @@ from models.models import ResetCode, User
 from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
 from services.email_sender import email_sender_service
 from services.authentication import auth_service
+from flask import make_response
 from app import db
 import secrets
 
@@ -33,7 +34,7 @@ class ResetCodesRoutes(Resource):
 
         email_sender_service.send_reset_password_email(email, code)
 
-        return {'message': 'ok'}, 200    
+        return make_response({'message': 'ok'}, 200)
 
 #/change-password-with-reset-code
 class ChangePasswordRoutes(Resource):
@@ -72,4 +73,4 @@ class ChangePasswordRoutes(Resource):
         db.session.delete(reset_code)
         db.session.commit()
         
-        return {'message': 'ok'}, 200
+        return make_response({'message': 'ok'}, 200)
