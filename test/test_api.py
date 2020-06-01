@@ -30,10 +30,11 @@ def test_register_user(testapp):
     assert json_data['message'] == 'ok'
     assert response.status_code == 200
 
+#/users/<int:id>
+
 def test_get_user_data_with_id(testapp):
     """Should return user data if user id and token is valid."""
     response = testapp.get('/users/1', headers={'x-access-token': token})
-    print(response.data)
     json_data = response.get_json()
 
     assert json_data['email'] == 'santiagomariani2@gmail.com'
@@ -41,6 +42,14 @@ def test_get_user_data_with_id(testapp):
     assert json_data['phone_number'] == '2267458826'
     assert json_data['image_location'] == 'http://www.google.com.ar'
     assert response.status_code == 200
+
+def test_get_user_data_of_user_that_does_not_exist(testapp):
+    """Get the user data of a user that does not exist in db."""
+    response = testapp.get('/users/2', headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert json_data['message'] == 'No user found with ID: 2'
+    assert response.status_code == 404   
 
 def test_reset_code(testapp):
     """Get a reset code with a valid email (a user with that email exist)."""

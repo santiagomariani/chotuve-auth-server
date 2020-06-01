@@ -6,7 +6,6 @@ import tempfile
 @pytest.yield_fixture(scope='session')
 def flask_app():
     app = create_app('testing')
-
     ctx = app.app_context()
     ctx.push()
 

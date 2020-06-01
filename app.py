@@ -2,9 +2,10 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
-from config import app_config
 from flask_failsafe import failsafe 
 from flask_restful import Api
+
+from config import app_config
 
 # database
 db = SQLAlchemy()
@@ -15,7 +16,8 @@ ma = Marshmallow()
 # Flask restful 
 api = Api()
 
-from resources import add_routes
+from resources import register_routes
+from handlers import register_error_handlers
 
 @failsafe
 def create_app(config_name):
@@ -24,8 +26,9 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     app.config['BUNDLE_ERRORS'] = True
 
-    add_routes(api)
-
+    register_routes(api)
+    register_error_handlers(app)
+    
     api.init_app(app)
     db.init_app(app)
     ma.init_app(app)
