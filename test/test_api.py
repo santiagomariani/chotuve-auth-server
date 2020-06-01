@@ -1,6 +1,7 @@
 import pytest
 from test.conftest import *
-from models.models import User
+from models.models import User, ResetCode
+from services.authentication import auth_service
 
 token = 'WlxyCjKBDOfjJAbW800G57o4eBIpe3nJwTiPrJJgeTnTX0RPzc0XxZkG0y2QGkJOr9Pu3V8unfkp0xhFx9b802G3gPsJ150USj1T0C9Nvi1Gy4GRz3FyaBgPoPXg'
 user_data = {'email':'santiagomariani2@gmail.com',
@@ -15,8 +16,56 @@ def test_register_user(testapp):
     response = testapp.post('/users', json=user_data
                                     , headers={'x-access-token': token})
     json_data = response.get_json()
+
     assert json_data['message'] == 'ok'
     assert response.status_code == 200
+
+def test_register_user_with_expired_token(testapp):
+    """Register a user with a expired token"""
+    auth_service.setExpiredToken()
+    response = testapp.post('/users', json=user_data
+                                    , headers={'x-access-token': token})
+    json_data = response.get_json()
+    
+    auth_service.setValidToken()
+    
+    assert json_data['message'] == 'Token has expired.'
+    assert response.status_code == 401
+    
+
+def test_register_user_with_invalid_token(testapp):
+    """Register a user with a invalid token"""
+    auth_service.setInvalidToken()
+    response = testapp.post('/users', json=user_data
+                                    , headers={'x-access-token': token})
+    json_data = response.get_json()
+    
+    auth_service.setValidToken()
+    
+    assert json_data['message'] == 'Token is invalid.'
+    assert response.status_code == 401
+
+def test_register_user_with_revoked_token(testapp):
+    """Register a user with a revoked token"""
+    
+    auth_service.setRevokedToken()
+    response = testapp.post('/users', json=user_data
+                                    , headers={'x-access-token': token})
+    json_data = response.get_json()
+    
+    auth_service.setValidToken()
+    
+    assert json_data['message'] == 'Token has been revoked.'
+    assert response.status_code == 401
+
+def test_register_user_without_token(testapp):
+    """Register a user without token"""
+    response = testapp.post('/users', json=user_data)
+
+    json_data = response.get_json()
+    
+    assert json_data['message'] == 'Missing user token!'
+    assert response.status_code == 401
 
 # GET /users/<int:id>
 
@@ -82,3 +131,14 @@ def test_get_uid_from_token(testapp):
     assert json_data['uid'] == 1
     assert response.status_code == 200    
 
+# POST /change-password-with-reset-code
+
+def test_change_password_with_reset_code(testapp):
+    """Should change the password with a valid reset code"""
+    # I use the reset code created before.
+    code = ResetCode.query.filter_by(id=1).first().code
+    response = testapp.post('/change-password-with-reset-code',
+                            json={'code':code,'password':'un_password','email':'santiagomariani2@gmail.com'})
+    json_data = response.get_json()
+    assert json_data['message'] == 'ok'
+    assert response.status_code == 200 
