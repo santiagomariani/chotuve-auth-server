@@ -58,7 +58,6 @@ class ChangePasswordRoutes(Resource):
 
         if (not reset_code):
             raise UserUnauthorizedError("Reset code does not exist.")
-        
 
         if (reset_code.has_expired()):
             raise UserUnauthorizedError("Reset code has expired.")

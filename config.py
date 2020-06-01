@@ -21,7 +21,7 @@ class TestConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    LOG_LEVEL = "INFO"
+    LOG_LEVEL = "WARN"
 
 app_config = {
     'development': DevelopmentConfig,

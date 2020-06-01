@@ -26,6 +26,14 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     app.config['BUNDLE_ERRORS'] = True
 
+    import logging
+    logging.basicConfig(
+        level=logging.getLevelName(app.config.get("LOG_LEVEL"))
+    )
+
+    logger = logging.getLogger("App")
+    logger.info("Starting app!")
+
     register_routes(api)
     register_error_handlers(app)
     
