@@ -66,4 +66,4 @@ class AuthenticationFake():
         self.expiredToken = False
         self.revokedToken = False
 
-auth_service = AuthenticationFirebase() if os.environ['APP_SETTINGS'] != 'development' else AuthenticationFake()
+auth_service = AuthenticationFirebase() if os.environ['APP_SETTINGS'] != 'testing' else AuthenticationFake()

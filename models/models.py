@@ -1,5 +1,6 @@
 from app import db, ma
 from datetime import datetime, timedelta
+import logging
 
 # User
 class User(db.Model):
@@ -32,4 +33,9 @@ class ResetCode(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), unique=True)
 
     def has_expired(self):
-        return datetime.utcnow() > (self.timestamp + timedelta(minutes=self.EXPIRATION_TIME_IN_MINUTES))
+        logger = logging.getLogger(self.__class__.__name__)
+        present_time = datetime.utcnow()
+        expiration_time = (self.timestamp + timedelta(minutes=self.EXPIRATION_TIME_IN_MINUTES))
+        logger.debug(f"present time: {present_time}")
+        logger.debug(f"time to compare with: {expiration_time}")
+        return present_time > expiration_time

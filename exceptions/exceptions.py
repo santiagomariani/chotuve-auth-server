@@ -1,12 +1,16 @@
-
+import logging 
 
 class ChotuveError(Exception):
 
     def __init__(self):
         Exception.__init__(self)
 
+    def logger(self):
+        return logging.getLogger(self.__class__.__name__)
+
     def to_dict(self):
-        return {"message": self.message}
+        self.logger().error(self.message)
+        return {"message":self.message}
 
 # ---------------------------------------------------
 
