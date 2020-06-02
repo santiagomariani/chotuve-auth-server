@@ -6,7 +6,6 @@ class Config(object):
     DEBUG = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
     BUNDLE_ERRORS = True
-    PROPAGATE_EXCEPTIONS = True
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
@@ -22,6 +21,7 @@ class TestConfig(Config):
 
 class ProductionConfig(Config):
     LOG_LEVEL = "WARN"
+    PROPAGATE_EXCEPTIONS = True
 
 app_config = {
     'development': DevelopmentConfig,
