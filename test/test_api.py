@@ -112,6 +112,9 @@ def test_modify_user_data_with_id(testapp):
     new_data["id"] = 1
     assert json_data == new_data
 
+    testapp.put('/users/1', json=user_data
+                                    , headers={'x-access-token': token}) 
+
 # POST /reset-codes
 
 def test_reset_code(testapp):
@@ -142,3 +145,59 @@ def test_change_password_with_reset_code(testapp):
     json_data = response.get_json()
     assert json_data['message'] == 'ok'
     assert response.status_code == 200 
+
+# GET /users?name=some_name&phone=some_phone&email=some_email
+
+def test_get_users_data_filtered_by_display_name(testapp):
+    """Should return users data filtered by display name 
+    (users which names contains indicated display name)"""
+    
+    user_a = User(email='armandoestabanquito@gmail.com',
+                    display_name='Armando Estaban Quito',
+                    phone_number='11533223536',
+                    image_location='http://www.google.com.ar',
+                    admin=False)
+    user_b = User(email='armando2020@gmail.com',
+                    display_name='Martin Armando Quito',
+                    phone_number='12121555530',
+                    image_location='http://www.facebook.com',
+                    admin=False)
+    user_c = User(email='carlosgutierrez@gmail.com',
+                    display_name='Carlos Gutierrez',
+                    phone_number='1125553512',
+                    image_location='http://www.youtube.com',
+                    admin=False)
+    db.session.add(user_a)
+    db.session.add(user_b)
+    db.session.add(user_c)
+    db.session.commit()
+
+    response = testapp.get('/users?name=Armando', headers={'x-access-token': token})
+    json_data = response.get_json()
+    
+    assert len(json_data['users']) == 2
+
+    for user in json_data['users']:
+        assert ('Armando' in user['display_name'])
+
+    assert response.status_code == 200 
+
+def test_get_users_data_filtered_by_phone_number(testapp):
+    """Should return users data filtered by phone number"""
+    response = testapp.get(f"/users?phone={user_data['phone_number']}", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert len(json_data['users']) == 1
+
+    assert json_data['users'][0]['display_name'] == user_data['display_name']
+    assert response.status_code == 200
+
+def test_get_users_data_filtered_by_email(testapp):
+    """Should return users data filtered by email"""
+    response = testapp.get(f"/users?email={user_data['email']}", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert len(json_data['users']) == 1
+
+    assert json_data['users'][0]['display_name'] == user_data['display_name']
+    assert response.status_code == 200

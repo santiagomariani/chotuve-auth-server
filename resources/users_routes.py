@@ -3,13 +3,35 @@ from flask import make_response
 from utils.decorators import check_token, check_token_and_get_user
 from app import db
 from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
-from models.models import User, user_schema
-
+from models.models import User, user_schema, users_schema
+import logging
 
 #/users
 class UsersRoutes(Resource):
     def __init__(self):
         super(UsersRoutes, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    @check_token
+    def get(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('email', type=str, required=False, location='args')
+        parser.add_argument('phone', type=str, required=False, location='args')
+        parser.add_argument('name', type=str, required=False, location='args')
+
+        args = parser.parse_args()
+
+        query = User.query
+        
+        if args['email']:
+            query = query.filter(User.email == args['email'])
+        if args['phone']:
+            print(args['phone'])
+            query = query.filter(User.phone_number == args['phone'])
+        if args['name']:
+            query = query.filter(User.display_name.contains(args['name']))
+        return make_response({'users': users_schema.dump(query.all())}, 200)
 
     @check_token
     def post(self):
