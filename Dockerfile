@@ -8,8 +8,6 @@ RUN pip install -r requirements.txt
 
 RUN apt-get update && apt-get install -y git
 
-RUN apt-get update && apt-get install -y git
-
 # flask envs
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
