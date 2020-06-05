@@ -24,7 +24,7 @@ def test_register_user(testapp):
     assert response.status_code == 201
 
 def test_register_user_with_expired_token(testapp):
-    """Register a user with a expired token"""
+    """Register a user with a expired token."""
     auth_service.setExpiredToken()
     response = testapp.post('/users', json=user_data
                                     , headers={'x-access-token': token})
@@ -37,7 +37,7 @@ def test_register_user_with_expired_token(testapp):
     
 
 def test_register_user_with_invalid_token(testapp):
-    """Register a user with a invalid token"""
+    """Register a user with a invalid token."""
     auth_service.setInvalidToken()
     response = testapp.post('/users', json=user_data
                                     , headers={'x-access-token': token})
@@ -49,7 +49,7 @@ def test_register_user_with_invalid_token(testapp):
     assert response.status_code == 401
 
 def test_register_user_with_revoked_token(testapp):
-    """Register a user with a revoked token"""
+    """Register a user with a revoked token."""
     
     auth_service.setRevokedToken()
     response = testapp.post('/users', json=user_data
@@ -67,8 +67,8 @@ def test_register_user_without_token(testapp):
 
     json_data = response.get_json()
     
-    assert json_data['message'] == 'Missing user token!'
-    assert response.status_code == 401
+    assert json_data['message']['x-access-token'] == "Missing user's token."
+    assert response.status_code == 400
 
 # GET /users/<int:id>
 
@@ -114,7 +114,7 @@ def test_modify_user_data_with_id(testapp):
 
 
 def test_modify_display_name_with_id(testapp):
-    """Should modify display name if id and token is valid"""
+    """Should modify display name if id and token is valid."""
 
     new_data = {'display_name':'Jorge Fernandez'}
     
@@ -129,7 +129,7 @@ def test_modify_display_name_with_id(testapp):
                                     , headers={'x-access-token': token})
 
 def test_modify_phone_number_with_id(testapp):
-    """Should modify phone_number if id and token is valid"""
+    """Should modify phone number if id and token is valid."""
 
     new_data = {'phone_number': '12345678910'}
     
@@ -144,7 +144,7 @@ def test_modify_phone_number_with_id(testapp):
                                     , headers={'x-access-token': token})
 
 def test_modify_image_location_with_id(testapp):
-    """Should modify image_location if id and token is valid"""
+    """Should modify image location if id and token is valid."""
 
     new_data = {'image_location': 'http://www.heroku.com/some_image.jpeg'}
     
@@ -157,6 +157,56 @@ def test_modify_image_location_with_id(testapp):
 
     testapp.put('/users/1', json=user_data
                                     , headers={'x-access-token': token})
+
+def test_cannot_modify_others_users_data_if_im_not_an_admin(testapp):
+    """Should return a message saying I cant modify others users data if I am not an admin."""
+
+    new_data = {'display_name': 'Jorge Fernandez'}
+    
+    response = testapp.put('/users/2', json=new_data
+                                    , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+    
+    assert json_data['message'] == "Only admins can change others users data."
+    assert response.status_code == 401
+
+def test_modify_non_existing_user(testapp, db_handle):
+    """Should return a message saying user does not exist."""
+    new_data = {'display_name': 'Jorge Fernandez'}
+
+    user = User.query.filter_by(id=1).first()
+    user.admin = True
+
+    db_handle.session.commit()
+    
+    response = testapp.put('/users/2', json=new_data
+                                    , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+
+    assert json_data['message'] == "No user found with ID: 2."
+    assert response.status_code == 404
+
+
+def test_modify_data_of_other_user_with_admin_user(testapp, db_handle):
+    """Should be able to modify others users data with admin user."""
+    new_data = {'display_name': 'Isidoro Tomas Gonzalez'}
+
+    new_user = User(email='isodorogonzalez@gmail.com',
+                    display_name='Isidoro Gonzalez',
+                    phone_number='11533223536',
+                    image_location='http://www.google.com.ar',
+                    admin=False)
+                
+    db_handle.session.add(new_user)
+    db_handle.session.commit()
+    
+    response = testapp.put(f"/users/{new_user.id}", json=new_data
+                                    , headers={'x-access-token': token}) 
+
+    json_data = response.get_json()
+
+    assert json_data['display_name'] == new_data['display_name']
+    assert response.status_code == 200
 
 # POST /reset-codes
 
@@ -191,7 +241,7 @@ def test_change_password_with_reset_code(testapp):
 
 # GET /users?name=some_name&phone=some_phone&email=some_email
 
-def test_get_users_data_filtered_by_display_name(testapp):
+def test_get_users_data_filtered_by_display_name(testapp, db_handle):
     """Should return users data filtered by display name 
     (users which names contains indicated display name)"""
     
@@ -210,10 +260,10 @@ def test_get_users_data_filtered_by_display_name(testapp):
                     phone_number='1125553512',
                     image_location='http://www.youtube.com',
                     admin=False)
-    db.session.add(user_a)
-    db.session.add(user_b)
-    db.session.add(user_c)
-    db.session.commit()
+    db_handle.session.add(user_a)
+    db_handle.session.add(user_b)
+    db_handle.session.add(user_c)
+    db_handle.session.commit()
 
     response = testapp.get('/users?name=Armando', headers={'x-access-token': token})
     json_data = response.get_json()
