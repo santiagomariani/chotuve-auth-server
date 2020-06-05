@@ -17,8 +17,11 @@ def test_register_user(testapp):
                                     , headers={'x-access-token': token})
     json_data = response.get_json()
 
-    assert json_data['message'] == 'ok'
-    assert response.status_code == 200
+    result_data = user_data.copy()
+    result_data["id"] = 1
+    
+    assert json_data == result_data
+    assert response.status_code == 201
 
 def test_register_user_with_expired_token(testapp):
     """Register a user with a expired token"""
@@ -102,18 +105,58 @@ def test_modify_user_data_with_id(testapp):
                                     , headers={'x-access-token': token}) 
     json_data = response.get_json()
     
-    assert json_data['message'] == 'ok'
-    assert response.status_code == 200
-
-    # check if data has changed
-
-    response = testapp.get('/users/1', headers={'x-access-token': token})
-    json_data = response.get_json()
     new_data["id"] = 1
     assert json_data == new_data
+    assert response.status_code == 200
 
     testapp.put('/users/1', json=user_data
+                                    , headers={'x-access-token': token})
+
+
+def test_modify_display_name_with_id(testapp):
+    """Should modify display name if id and token is valid"""
+
+    new_data = {'display_name':'Jorge Fernandez'}
+    
+    response = testapp.put('/users/1', json=new_data
                                     , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+    
+    assert json_data['display_name'] == new_data['display_name']
+    assert response.status_code == 200
+
+    testapp.put('/users/1', json=user_data
+                                    , headers={'x-access-token': token})
+
+def test_modify_phone_number_with_id(testapp):
+    """Should modify phone_number if id and token is valid"""
+
+    new_data = {'phone_number': '12345678910'}
+    
+    response = testapp.put('/users/1', json=new_data
+                                    , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+    
+    assert json_data['phone_number'] == new_data['phone_number']
+    assert response.status_code == 200
+
+    testapp.put('/users/1', json=user_data
+                                    , headers={'x-access-token': token})
+
+def test_modify_image_location_with_id(testapp):
+    """Should modify image_location if id and token is valid"""
+
+    new_data = {'image_location': 'http://www.heroku.com/some_image.jpeg'}
+    
+    response = testapp.put('/users/1', json=new_data
+                                    , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+    
+    assert json_data['image_location'] == new_data['image_location']
+    assert response.status_code == 200
+
+    testapp.put('/users/1', json=user_data
+                                    , headers={'x-access-token': token})
 
 # POST /reset-codes
 
