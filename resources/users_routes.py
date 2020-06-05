@@ -92,12 +92,12 @@ class UniqueUserRoutes(Resource):
                 
         if not user.admin:
             if user.id != user_id:
-                raise UserUnauthorizedError(f"Only admins can change other users data.")
+                raise UserUnauthorizedError(f"Only admins can change others users data.")
 
         user_to_modify = User.query.filter_by(id=user_id).first()
 
         if not user_to_modify:
-            raise UserNotFoundError(f"No user found with ID: {user_id}")
+            raise UserNotFoundError(f"No user found with ID: {user_id}.")
 
         if args['email']:
             user_to_modify.email = args['email']

@@ -161,17 +161,52 @@ def test_modify_image_location_with_id(testapp):
 def test_cannot_modify_others_users_data_if_im_not_an_admin(testapp):
     """Should return a message saying I cant modify others users data if I am not an admin."""
 
-    new_data = {'email':'santiagomariani2@gmail.com',
-                'display_name': 'Santiago Tomas Mariani',
-                'phone_number': '2254444444',
-                'image_location': 'http://www.facebook.com'}
+    new_data = {'display_name': 'Jorge Fernandez'}
     
     response = testapp.put('/users/2', json=new_data
                                     , headers={'x-access-token': token}) 
     json_data = response.get_json()
     
-    assert json_data['message'] == "Only admins can change other users data."
+    assert json_data['message'] == "Only admins can change others users data."
     assert response.status_code == 401
+
+def test_modify_non_existing_user(testapp, db_handle):
+    """Should return a message saying user does not exist."""
+    new_data = {'display_name': 'Jorge Fernandez'}
+
+    user = User.query.filter_by(id=1).first()
+    user.admin = True
+
+    db_handle.session.commit()
+    
+    response = testapp.put('/users/2', json=new_data
+                                    , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+
+    assert json_data['message'] == "No user found with ID: 2."
+    assert response.status_code == 404
+
+
+def test_modify_data_of_other_user_with_admin_user(testapp, db_handle):
+    """Should be able to modify others users data with admin user."""
+    new_data = {'display_name': 'Isidoro Tomas Gonzalez'}
+
+    new_user = User(email='isodorogonzalez@gmail.com',
+                    display_name='Isidoro Gonzalez',
+                    phone_number='11533223536',
+                    image_location='http://www.google.com.ar',
+                    admin=False)
+                
+    db_handle.session.add(new_user)
+    db_handle.session.commit()
+    
+    response = testapp.put(f"/users/{new_user.id}", json=new_data
+                                    , headers={'x-access-token': token}) 
+
+    json_data = response.get_json()
+
+    assert json_data['display_name'] == new_data['display_name']
+    assert response.status_code == 200
 
 # POST /reset-codes
 
@@ -206,7 +241,7 @@ def test_change_password_with_reset_code(testapp):
 
 # GET /users?name=some_name&phone=some_phone&email=some_email
 
-def test_get_users_data_filtered_by_display_name(testapp):
+def test_get_users_data_filtered_by_display_name(testapp, db_handle):
     """Should return users data filtered by display name 
     (users which names contains indicated display name)"""
     
@@ -225,10 +260,10 @@ def test_get_users_data_filtered_by_display_name(testapp):
                     phone_number='1125553512',
                     image_location='http://www.youtube.com',
                     admin=False)
-    db.session.add(user_a)
-    db.session.add(user_b)
-    db.session.add(user_c)
-    db.session.commit()
+    db_handle.session.add(user_a)
+    db_handle.session.add(user_b)
+    db_handle.session.add(user_c)
+    db_handle.session.commit()
 
     response = testapp.get('/users?name=Armando', headers={'x-access-token': token})
     json_data = response.get_json()
