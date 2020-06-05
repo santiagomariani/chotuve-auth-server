@@ -92,7 +92,7 @@ class UniqueUserRoutes(Resource):
                 
         if not user.admin:
             if user.id != user_id:
-                raise UserUnauthorizedError(f"User with ID: {user_id} cannot change other user's data. ")
+                raise UserUnauthorizedError(f"Only admins can change other users data.")
 
         user_to_modify = User.query.filter_by(id=user_id).first()
 

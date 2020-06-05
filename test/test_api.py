@@ -24,7 +24,7 @@ def test_register_user(testapp):
     assert response.status_code == 201
 
 def test_register_user_with_expired_token(testapp):
-    """Register a user with a expired token"""
+    """Register a user with a expired token."""
     auth_service.setExpiredToken()
     response = testapp.post('/users', json=user_data
                                     , headers={'x-access-token': token})
@@ -37,7 +37,7 @@ def test_register_user_with_expired_token(testapp):
     
 
 def test_register_user_with_invalid_token(testapp):
-    """Register a user with a invalid token"""
+    """Register a user with a invalid token."""
     auth_service.setInvalidToken()
     response = testapp.post('/users', json=user_data
                                     , headers={'x-access-token': token})
@@ -49,7 +49,7 @@ def test_register_user_with_invalid_token(testapp):
     assert response.status_code == 401
 
 def test_register_user_with_revoked_token(testapp):
-    """Register a user with a revoked token"""
+    """Register a user with a revoked token."""
     
     auth_service.setRevokedToken()
     response = testapp.post('/users', json=user_data
@@ -114,7 +114,7 @@ def test_modify_user_data_with_id(testapp):
 
 
 def test_modify_display_name_with_id(testapp):
-    """Should modify display name if id and token is valid"""
+    """Should modify display name if id and token is valid."""
 
     new_data = {'display_name':'Jorge Fernandez'}
     
@@ -129,7 +129,7 @@ def test_modify_display_name_with_id(testapp):
                                     , headers={'x-access-token': token})
 
 def test_modify_phone_number_with_id(testapp):
-    """Should modify phone_number if id and token is valid"""
+    """Should modify phone number if id and token is valid."""
 
     new_data = {'phone_number': '12345678910'}
     
@@ -144,7 +144,7 @@ def test_modify_phone_number_with_id(testapp):
                                     , headers={'x-access-token': token})
 
 def test_modify_image_location_with_id(testapp):
-    """Should modify image_location if id and token is valid"""
+    """Should modify image location if id and token is valid."""
 
     new_data = {'image_location': 'http://www.heroku.com/some_image.jpeg'}
     
@@ -157,6 +157,21 @@ def test_modify_image_location_with_id(testapp):
 
     testapp.put('/users/1', json=user_data
                                     , headers={'x-access-token': token})
+
+def test_cannot_modify_others_users_data_if_im_not_an_admin(testapp):
+    """Should return a message saying I cant modify others users data if I am not an admin."""
+
+    new_data = {'email':'santiagomariani2@gmail.com',
+                'display_name': 'Santiago Tomas Mariani',
+                'phone_number': '2254444444',
+                'image_location': 'http://www.facebook.com'}
+    
+    response = testapp.put('/users/2', json=new_data
+                                    , headers={'x-access-token': token}) 
+    json_data = response.get_json()
+    
+    assert json_data['message'] == "Only admins can change other users data."
+    assert response.status_code == 401
 
 # POST /reset-codes
 
