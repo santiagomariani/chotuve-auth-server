@@ -17,8 +17,11 @@ def test_register_user(testapp):
                                     , headers={'x-access-token': token})
     json_data = response.get_json()
 
-    assert json_data['message'] == 'ok'
-    assert response.status_code == 200
+    result_data = user_data.copy()
+    result_data["id"] = 1
+    
+    assert json_data == result_data
+    assert response.status_code == 201
 
 def test_register_user_with_expired_token(testapp):
     """Register a user with a expired token"""

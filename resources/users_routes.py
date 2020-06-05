@@ -54,7 +54,7 @@ class UsersRoutes(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return make_response({'message': 'ok'}, 200)
+        return make_response(user_schema.jsonify(user), 201)
 
 
 #/users/<int:user_id>
