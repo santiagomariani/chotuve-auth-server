@@ -89,7 +89,7 @@ class UniqueUserRoutes(Resource):
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
         
         args = parser.parse_args()
-
+                
         if not user.admin:
             if user.id != user_id:
                 raise UserUnauthorizedError(f"User with ID: {user_id} cannot change other user's data. ")
@@ -99,17 +99,17 @@ class UniqueUserRoutes(Resource):
         if not user_to_modify:
             raise UserNotFoundError(f"No user found with ID: {user_id}")
 
-        if 'email' in args:
+        if args['email']:
             user_to_modify.email = args['email']
-        if 'display_name' in args:
+        if args['display_name']:
             user_to_modify.display_name = args['display_name']
-        if 'image_location' in args:
+        if args['image_location']:
             user_to_modify.image_location = args['image_location']
-        if 'phone_number' in args:
+        if args['phone_number']:
             user_to_modify.phone_number = args['phone_number']
         
         db.session.commit() 
-        return make_response({'message': 'ok'}, 200)
+        return make_response(user_schema.jsonify(user_to_modify), 200)
 
 #/users/id
 class UserIdFromTokenRoute(Resource):
