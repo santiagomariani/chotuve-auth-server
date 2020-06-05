@@ -5,6 +5,7 @@ from app import db
 from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
 from models.models import User, user_schema, users_schema
 import logging
+from services.authentication import auth_service
 
 #/users
 class UsersRoutes(Resource):
@@ -33,7 +34,6 @@ class UsersRoutes(Resource):
             query = query.filter(User.display_name.contains(args['name']))
         return make_response({'users': users_schema.dump(query.all())}, 200)
 
-    @check_token
     def post(self):
         parser = reqparse.RequestParser()
 
@@ -44,6 +44,11 @@ class UsersRoutes(Resource):
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
 
         args = parser.parse_args()
+
+        email_associated_with_token = auth_service.verify_id_token(args['x-access-token'])['email']
+
+        if email_associated_with_token != args['email']:
+            raise UserUnauthorizedError(f"Token is invalid.")
 
         user = User(email=args['email'],
                     display_name=args['display_name'],

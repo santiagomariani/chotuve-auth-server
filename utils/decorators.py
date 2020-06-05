@@ -12,7 +12,7 @@ def check_token(f):
             token = request.headers['x-access-token']
 
         if not token:
-            return make_response({'message' : 'Missing user token!'}, 401)
+            return make_response({'message' : "Missing user's token."}, 400)
 
         auth_service.verify_id_token(token)
         return f(*args, **kwargs)
@@ -27,7 +27,7 @@ def check_token_and_get_user(f):
             token = request.headers['x-access-token']
 
         if not token:
-            return make_response({'message' : 'Missing user token!'}, 401)
+            return make_response({'message' : "Missing user's token."}, 400)
 
         user_data = auth_service.verify_id_token(token)
         user = User.query.filter_by(email=user_data['email']).first()

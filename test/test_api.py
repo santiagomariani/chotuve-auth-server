@@ -67,8 +67,8 @@ def test_register_user_without_token(testapp):
 
     json_data = response.get_json()
     
-    assert json_data['message'] == 'Missing user token!'
-    assert response.status_code == 401
+    assert json_data['message']['x-access-token'] == "Missing user's token."
+    assert response.status_code == 400
 
 # GET /users/<int:id>
 
