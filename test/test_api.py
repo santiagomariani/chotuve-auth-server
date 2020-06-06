@@ -8,6 +8,7 @@ user_data = {'email':'santiagomariani2@gmail.com',
             'display_name': 'Santiago Mariani',
             'phone_number': '2267458826',
             'image_location': 'http://www.google.com.ar'}
+            
 # POST /users
 
 def test_register_user(testapp):
@@ -208,14 +209,35 @@ def test_modify_data_of_other_user_with_admin_user(testapp, db_handle):
     assert json_data['display_name'] == new_data['display_name']
     assert response.status_code == 200
 
+
 # POST /reset-codes
 
-def test_reset_code(testapp):
-    """Get a reset code with a valid email (a user with that email exist)."""
+from services.time import time_service
+from datetime import datetime
+
+def test_get_reset_code(testapp):
+    """Get a reset code with a valid email."""
+
+    test_date = datetime(year=2020,month=6,day=5,minute=0,second=0)
+
+    time_service.set_date(test_date)
+
     response = testapp.post('/reset-codes', json={'email': 'santiagomariani2@gmail.com'})
+
     json_data = response.get_json()
+
     assert json_data['message'] == 'ok'                                       
     assert response.status_code == 200
+    assert ResetCode.query.count() == 1
+
+def test_get_reset_code_with_invalid_email(testapp):
+    """Should not be able to get reset code with invalid email (user does not exist)"""
+    response = testapp.post('/reset-codes', json={'email': 'martinperez@gmail.com'})
+
+    json_data = response.get_json()
+
+    assert json_data['message'] == 'No user found.'                                       
+    assert response.status_code == 404                                       
 
 # GET /users/id
 
@@ -233,11 +255,67 @@ def test_change_password_with_reset_code(testapp):
     """Should change the password with a valid reset code"""
     # I use the reset code created before.
     code = ResetCode.query.filter_by(id=1).first().code
+
+    test_date = datetime(year=2020,month=6,day=5,minute=14,second=0)
+    time_service.set_date(test_date)
+
     response = testapp.post('/change-password-with-reset-code',
                             json={'code':code,'password':'un_password','email':'santiagomariani2@gmail.com'})
+    
     json_data = response.get_json()
+    
     assert json_data['message'] == 'ok'
-    assert response.status_code == 200 
+    assert response.status_code == 200
+    assert ResetCode.query.count() == 0 
+    
+
+def test_change_password_with_reset_code_when_code_is_expired(testapp):
+    """Should not be able to change the password with a expired reset code"""
+    # I use the reset code created before.
+
+    test_date = datetime(year=2020,month=6,day=5,minute=0,second=0)
+    time_service.set_date(test_date)
+
+    testapp.post('/reset-codes', json={'email': 'santiagomariani2@gmail.com'})
+
+    code = ResetCode.query.filter_by(id=1).first().code
+
+    test_date = datetime(year=2020,month=6,day=5,minute=15,second=1)
+    time_service.set_date(test_date)
+
+    response = testapp.post('/change-password-with-reset-code',
+                            json={'code':code,'password':'un_password','email':'santiagomariani2@gmail.com'})
+    
+    json_data = response.get_json()
+    
+    assert json_data['message'] == 'Reset code has expired.'
+    assert response.status_code == 401
+    assert ResetCode.query.count() == 1  
+
+def test_change_password_with_reset_code_with_valid_reset_code_but_wrong_email(testapp):
+    """Should not be able to change the password"""
+    
+    code = ResetCode.query.filter_by(id=1).first().code
+
+    test_date = datetime(year=2020,month=6,day=5,minute=10,second=0)
+    time_service.set_date(test_date)
+
+    response = testapp.post('/change-password-with-reset-code',
+                            json={'code':code,'password':'un_password','email':'jorgemendez@gmail.com'})
+    json_data = response.get_json()
+
+    assert json_data['message'] == 'Reset code is invalid.'
+    assert response.status_code == 401
+    assert ResetCode.query.count() == 1  
+
+def test_change_password_with_invalid_reset_code(testapp):
+    """Should not be able to change the password"""
+    response = testapp.post('/change-password-with-reset-code',
+                            json={'code':'534saX','password':'un_password','email':'santiagomariani2@gmail.com'})
+    json_data = response.get_json()
+
+    assert json_data['message'] == 'Reset code is invalid.'
+    assert response.status_code == 401  
 
 # GET /users?name=some_name&phone=some_phone&email=some_email
 

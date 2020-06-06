@@ -1,5 +1,4 @@
 from app import db, ma
-from datetime import datetime, timedelta
 import logging
 
 # User
@@ -21,21 +20,30 @@ class UserSchema(ma.Schema):
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
+import secrets
+from services.time import time_service
+
 # ResetCode
 class ResetCode(db.Model):
     __tablename__ = "reset_code"
 
-    EXPIRATION_TIME_IN_MINUTES = 15
+    _EXPIRATION_TIME_IN_MINUTES = 15
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(6), unique=True, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow())
+    timestamp = db.Column(db.DateTime, default=time_service.get_date())
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), unique=True)
+
+    def __init__(self, user):
+        # delete default
+        self.timestamp = time_service.get_date()
+        self.code = secrets.token_urlsafe(4)
+        self.user = user
 
     def has_expired(self):
         logger = logging.getLogger(self.__class__.__name__)
-        present_time = datetime.utcnow()
-        expiration_time = (self.timestamp + timedelta(minutes=self.EXPIRATION_TIME_IN_MINUTES))
+        present_time = time_service.get_date()
+        expiration_time = time_service.sum_minutes_to_date(self.timestamp, self._EXPIRATION_TIME_IN_MINUTES)
         logger.debug(f"present time: {present_time}")
         logger.debug(f"time to compare with: {expiration_time}")
         return present_time > expiration_time
