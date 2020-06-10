@@ -17,14 +17,19 @@ class UsersRoutes(Resource):
     def get(self):
         parser = reqparse.RequestParser()
 
+        # search
         parser.add_argument('email', type=str, required=False, location='args')
         parser.add_argument('phone', type=str, required=False, location='args')
         parser.add_argument('name', type=str, required=False, location='args')
 
+        # pagination params
+        parser.add_argument('per_page', type=int, required=False, location='args')
+        parser.add_argument('page', type=int, required=False, location='args')
+
         args = parser.parse_args()
 
         query = User.query
-        
+
         if args['email']:
             query = query.filter(User.email == args['email'])
         if args['phone']:
@@ -32,6 +37,19 @@ class UsersRoutes(Resource):
             query = query.filter(User.phone_number == args['phone'])
         if args['name']:
             query = query.filter(User.display_name.contains(args['name']))
+
+        # TODO: probablemente tenga que hacer que per_page y page sean obligatorios.
+        # En la realidad no seria posible devolver todos los datos.
+        if args['per_page'] and args['page']:
+            pagination = query.paginate(per_page=args['per_page'], page=args['page'])
+            items = pagination.items
+            page_number = pagination.page
+            return make_response({
+                'users': users_schema.dump(items),
+                'total': query.count(),
+                'page': page_number
+                }, 200)
+
         return make_response({'users': users_schema.dump(query.all())}, 200)
 
     def post(self):

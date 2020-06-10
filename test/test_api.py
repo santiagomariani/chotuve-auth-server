@@ -372,3 +372,55 @@ def test_get_users_data_filtered_by_email(testapp):
 
     assert json_data['users'][0]['display_name'] == user_data['display_name']
     assert response.status_code == 200
+
+def test_get_users_per_page(testapp, db_handle):
+    User.query.delete()
+    db_handle.session.commit()
+
+    an_email = "a@gmail.com"
+    for i in range(0,12):  
+        user_a = User(email=an_email,
+                    display_name='Armando Estaban Quito',
+                    phone_number='11533223536',
+                    image_location='http://www.google.com.ar',
+                    admin=False)
+
+        db_handle.session.add(user_a)
+        db_handle.session.commit()
+        an_email = "a" + an_email
+    
+    response = testapp.get(f"/users?per_page=6&page=1", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert len(json_data['users']) == 6
+    assert json_data['page'] == 1
+    assert json_data['total'] == 12
+
+    response = testapp.get(f"/users?per_page=6&page=2", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert len(json_data['users']) == 6
+    assert json_data['page'] == 2
+    assert json_data['total'] == 12
+
+    response = testapp.get(f"/users?per_page=5&page=1", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert len(json_data['users']) == 5
+    assert json_data['page'] == 1
+    assert json_data['total'] == 12
+
+    response = testapp.get(f"/users?per_page=5&page=2", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert len(json_data['users']) == 5
+    assert json_data['page'] == 2
+    assert json_data['total'] == 12
+
+    response = testapp.get(f"/users?per_page=5&page=3", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert len(json_data['users']) == 2
+    assert json_data['page'] == 3
+    assert json_data['total'] == 12
+
