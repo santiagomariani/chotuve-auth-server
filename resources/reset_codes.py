@@ -5,7 +5,6 @@ from services.email_sender import email_sender_service
 from services.authentication import auth_service
 from flask import make_response
 from app import db
-import secrets
 
 #/reset-codes
 class ResetCodesRoutes(Resource):
@@ -24,15 +23,14 @@ class ResetCodesRoutes(Resource):
         user = User.query.filter_by(email=email).first()
         
         if (not user):
-            raise UserNotFoundError(f"No user found with email {email}.")
+            raise UserNotFoundError(f"No user found.")
         
-        code = secrets.token_urlsafe(4)
-        reset_code = ResetCode(code=code,user=user)
+        reset_code = ResetCode(user)
 
         db.session.add(reset_code)
         db.session.commit()
 
-        email_sender_service.send_reset_password_email(email, code)
+        email_sender_service.send_reset_password_email(email, reset_code.code)
 
         return make_response({'message': 'ok'}, 200)
 
@@ -57,7 +55,7 @@ class ChangePasswordRoutes(Resource):
         reset_code = ResetCode.query.filter_by(code=code).first()
 
         if (not reset_code):
-            raise UserUnauthorizedError("Reset code does not exist.")
+            raise UserUnauthorizedError("Reset code is invalid.")
 
         if (reset_code.has_expired()):
             raise UserUnauthorizedError("Reset code has expired.")
@@ -65,7 +63,7 @@ class ChangePasswordRoutes(Resource):
         user = reset_code.user
 
         if(user.email != email):
-            raise UserUnauthorizedError(f"Reset code does not belong to the email sent.")
+            raise UserUnauthorizedError(f"Reset code is invalid.")
 
         auth_service.update_password(email, password)
 

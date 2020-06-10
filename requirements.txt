@@ -38,3 +38,6 @@ pdp==0.3.0
 firebase-admin==4.3.0
 flask-restful
 pytest-env==0.6.2
+coverage
+coveralls[yaml]
+pytest-cov

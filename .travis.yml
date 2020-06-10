@@ -18,7 +18,9 @@ install:
 script:
 - docker build -t chotuve-auth-server .
 - docker run -e APP_SETTINGS=development --rm -d --env PORT=5000 -p 5000:5000 --name chotuve-auth-server chotuve-auth-server
-- docker exec -it chotuve-auth-server pytest
+- docker exec -it chotuve-auth-server coverage run -m pytest
+- docker exec -it -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" chotuve-auth-server coveralls
+
 deploy:
   - provider: script
     skip_cleanup: true
