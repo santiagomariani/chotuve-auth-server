@@ -4,7 +4,7 @@ from flask_marshmallow import Marshmallow
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
 from flask_failsafe import failsafe 
 from flask_restful import Api
-
+from flask_cors import CORS
 from config import app_config
 
 # database
@@ -24,6 +24,7 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
+    CORS(app)
 
     import logging
     logging.basicConfig(

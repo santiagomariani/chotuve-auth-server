@@ -41,3 +41,4 @@ pytest-env==0.6.2
 coverage
 coveralls[yaml]
 pytest-cov
+Flask-Cors==3.0.8
