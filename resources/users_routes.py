@@ -6,6 +6,7 @@ from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
 from models.models import User, user_schema, users_schema
 import logging
 from services.authentication import auth_service
+from sqlalchemy import or_, sql
 
 #/users
 class UsersRoutes(Resource):
@@ -28,14 +29,24 @@ class UsersRoutes(Resource):
 
         args = parser.parse_args()
 
-        query = User.query
+        query = User.query.filter(sql.false())
 
         if args['email']:
-            query = query.filter(User.email.contains(args['email']))
+            query1 = User.query.filter(User.email.contains(args['email']))
+            query = query.union(query1)
+
         if args['phone']:
-            query = query.filter(User.phone_number.contains(args['phone']))
+            query2 = User.query.filter(User.phone_number.contains(args['phone']))
+            query = query.union(query2)
+            
         if args['name']:
-            query = query.filter(User.display_name.contains(args['name']))
+            query3 = User.query.filter(User.display_name.contains(args['name']))
+            query = query.union(query3)
+
+        not_searching = not args['email'] and not args['phone'] and not args['name']
+
+        if (not_searching):
+            query = User.query
 
         # TODO: probablemente tenga que hacer que per_page y page sean obligatorios.
         # En la realidad no seria posible devolver todos los datos.
