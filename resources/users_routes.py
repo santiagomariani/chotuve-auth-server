@@ -31,10 +31,9 @@ class UsersRoutes(Resource):
         query = User.query
 
         if args['email']:
-            query = query.filter(User.email == args['email'])
+            query = query.filter(User.email.contains(args['email']))
         if args['phone']:
-            print(args['phone'])
-            query = query.filter(User.phone_number == args['phone'])
+            query = query.filter(User.phone_number.contains(args['phone']))
         if args['name']:
             query = query.filter(User.display_name.contains(args['name']))
 
