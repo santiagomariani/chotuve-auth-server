@@ -24,7 +24,6 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
-    CORS(app, resources={r"/": {"origins": ""}})
     
     import logging
     logging.basicConfig(
@@ -36,6 +35,9 @@ def create_app(config_name):
 
     register_routes(api)
     register_error_handlers(app)
+
+    CORS(app, resources={r'/.*': {"origins": "*"}})
+    app.config['CORS_HEADERS'] = 'Content-Type'
     
     api.init_app(app)
     db.init_app(app)
