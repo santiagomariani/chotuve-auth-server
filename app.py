@@ -36,18 +36,9 @@ def create_app(config_name):
     register_routes(api)
     register_error_handlers(app)
 
-    #CORS(app, resources={r'/.*': {"origins": "*"}})
-    #app.config['CORS_HEADERS'] = 'Content-Type'
+    CORS(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
     
-    @app.after_request
-    def add_headers(response):
-        response.headers.add('Content-Type', 'application/json')
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-        response.headers.add('Access-Control-Expose-Headers', 'Content-Type,Content-Length,Authorization,X-Pagination')
-        return response
-
     api.init_app(app)
     db.init_app(app)
     ma.init_app(app)

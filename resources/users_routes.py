@@ -141,8 +141,15 @@ class UniqueUserRoutes(Resource):
         if args['phone_number']:
             user_to_modify.phone_number = args['phone_number']
         
-        db.session.commit() 
-        return make_response(user_schema.jsonify(user_to_modify), 200)
+        db.session.commit()
+        response = make_response(user_schema.jsonify(user_to_modify), 200)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+    def options (self):
+        return {'Allow' : 'PUT' }, 200, \
+        { 'Access-Control-Allow-Origin': '*', \
+        'Access-Control-Allow-Methods' : 'PUT,GET' }
 
 #/users/id
 class UserIdFromTokenRoute(Resource):
