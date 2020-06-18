@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask import Flask, jsonify, request, session, redirect, url_for, make_response
 from flask_failsafe import failsafe 
-from flask_restful import Api, cors
+from flask_restful import Api
+from flask_restful.utils import cors
 from flask_cors import CORS
 from config import app_config
 
