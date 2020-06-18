@@ -145,13 +145,6 @@ class UniqueUserRoutes(Resource):
         response = make_response(user_schema.jsonify(user_to_modify), 200)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
-
-    def options(self, user_id):
-        response = make_response()
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "*")
-        response.headers.add("Access-Control-Allow-Methods", "*")
-        return response
    
 
 #/users/id
