@@ -37,7 +37,7 @@ def create_app(config_name):
     register_routes(api)
     register_error_handlers(app)
 
-    CORS(app, origins=[*])
+    CORS(app, origins=["*"])
     #app.config['CORS_HEADERS'] = 'Content-Type'
     
     api.init_app(app)
