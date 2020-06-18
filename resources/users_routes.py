@@ -146,11 +146,6 @@ class UniqueUserRoutes(Resource):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
-    def options (self):
-        return {'Allow' : 'PUT' }, 200, \
-        { 'Access-Control-Allow-Origin': '*', \
-        'Access-Control-Allow-Methods' : 'PUT,GET' }
-
 #/users/id
 class UserIdFromTokenRoute(Resource):
     def __init__(self):
