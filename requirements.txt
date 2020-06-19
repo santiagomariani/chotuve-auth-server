@@ -36,7 +36,7 @@ Pyrebase4==4.3.0
 Flask-Failsafe==0.2
 pdp==0.3.0
 firebase-admin==4.3.0
-flask-restful
+Flask-RESTful==0.3.8
 pytest-env==0.6.2
 coverage
 coveralls[yaml]

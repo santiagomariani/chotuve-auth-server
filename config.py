@@ -17,7 +17,6 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOG_LEVEL = "DEBUG"
-    WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
     LOG_LEVEL = "WARN"

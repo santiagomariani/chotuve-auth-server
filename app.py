@@ -37,11 +37,20 @@ def create_app(config_name):
     register_routes(api)
     register_error_handlers(app)
 
-    CORS(app, origins=["*"], supports_credentials=True)
+    #CORS(app, origins=["*"], supports_credentials=True)
     #app.config['CORS_HEADERS'] = 'Content-Type'
     
     api.init_app(app)
     db.init_app(app)
     ma.init_app(app)
+
+    api.decorators = [
+            cors.crossdomain(
+                origin='*',
+                methods = ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+                attach_to_all = True,
+                automatic_options = True
+            )
+    ]
 
     return app

@@ -34,7 +34,7 @@ def check_token_and_get_user(f):
         return f(user, *args, **kwargs)
     return decorated
 
-
+"""
 def cross_origin(origin="*"):
     def cross_origin(func):
         @wraps(func)
@@ -63,3 +63,4 @@ def cross_origin(origin="*"):
         return _decoration
 
     return cross_origin
+"""
