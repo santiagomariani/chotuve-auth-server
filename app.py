@@ -37,8 +37,8 @@ def create_app(config_name):
     register_routes(api)
     register_error_handlers(app)
 
-    #CORS(app, origins=["*"], supports_credentials=True)
-    #app.config['CORS_HEADERS'] = 'Content-Type'
+    CORS(app, origins=["*"], supports_credentials=True)
+    app.config['CORS_HEADERS'] = 'Content-Type'
     
     api.init_app(app)
     db.init_app(app)
@@ -49,7 +49,7 @@ def create_app(config_name):
                 origin='*',
                 methods = ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
                 attach_to_all = True,
-                automatic_options = True
+                automatic_options = False
             )
     ]
 
