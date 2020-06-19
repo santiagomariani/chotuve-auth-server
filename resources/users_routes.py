@@ -1,6 +1,6 @@
 from flask_restful import reqparse, Resource
 from flask import make_response
-from utils.decorators import check_token, check_token_and_get_user
+from utils.decorators import check_token, check_token_and_get_user, cross_origin
 from app import db
 from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
 from models.models import User, user_schema, users_schema
@@ -110,6 +110,7 @@ class UniqueUserRoutes(Resource):
             raise UserNotFoundError(f"No user found with ID: {user_id}")
         return make_response(user_schema.jsonify(user), 200)
         
+    @cross_origin()
     @check_token_and_get_user
     def put(user, self, user_id):
 
