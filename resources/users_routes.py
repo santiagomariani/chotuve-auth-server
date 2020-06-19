@@ -149,7 +149,8 @@ class UniqueUserRoutes(Resource):
     def options (self, user_id):
         return {'Allow' : 'PUT' }, 200, \
         { 'Access-Control-Allow-Origin': '*', \
-        'Access-Control-Allow-Methods' : 'PUT,GET' }
+        'Access-Control-Allow-Methods' : 'PUT,GET,POST,DELETE',
+        'Access-Control-Allow-Headers':'Content-Type,Authorization,x-access-token' }
    
 
 #/users/id
