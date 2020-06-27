@@ -27,7 +27,7 @@ class AuthenticationFirebase():
         uid = self._get_uid_with_email(old_email)
         auth.update_user(uid, email=new_email)
     
-    def has_email_provider(email):
+    def has_email_provider(self, email):
         user = auth.get_user_by_email(email)
         return user.provider_id == 'password' # check for a better way of doing this!
 
@@ -69,7 +69,7 @@ class AuthenticationFake():
     def update_email(self, old_email, new_email):
         return True
     
-    def has_email_provider(email):
+    def has_email_provider(self, email):
         return True
 
     def setExpiredToken(self):
