@@ -115,7 +115,7 @@ class UniqueUserRoutes(Resource):
         if not user:
             raise UserNotFoundError(f"No user found with ID: {user_id}")
         return make_response(user_schema.jsonify(user), 200)
-        
+
     @check_token_and_get_user
     def put(user, self, user_id):
 
@@ -125,6 +125,7 @@ class UniqueUserRoutes(Resource):
         parser.add_argument("email", location="json", required=False, type=str)
         parser.add_argument("phone_number", location="json", required=False, type=str)
         parser.add_argument("image_location", location="json", required=False, type=str)
+        parser.add_argument("password", location='json', required=False, type=str)
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
         
         args = parser.parse_args()
@@ -138,8 +139,16 @@ class UniqueUserRoutes(Resource):
         if not user_to_modify:
             raise UserNotFoundError(f"No user found with ID: {user_id}.")
 
-        if args['email']:
-            user_to_modify.email = args['email']
+        if (args['email'] or args['password']):
+            if (auth_service.has_email_provider(user_to_modify.email)):
+                if args['email']:
+                    auth_service.update_email(user_to_modify.email, args['email'])
+                    user_to_modify.email = args['email']
+                if args['password']:
+                    auth_service.update_password(args['password'])
+            else:
+                raise UserBadRequestError("Cannot modify email or password if user does not have email provider.")
+
         if args['display_name']:
             user_to_modify.display_name = args['display_name']
         if args['image_location']:
@@ -154,8 +163,6 @@ class UniqueUserRoutes(Resource):
 
     @check_token_and_get_user
     def delete(user, self, user_id):
-        print("HOLA")
-        print(type(user))
         if not user.admin:
             if user.id != user_id:
                 raise UserUnauthorizedError(f"Only admins can delete other users.")
