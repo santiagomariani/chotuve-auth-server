@@ -27,10 +27,14 @@ class AuthenticationFirebase():
         uid = self._get_uid_with_email(email)
         auth.delete_user(uid)
 
+    def create_user(self, email, password):
+        auth.create_user(email=email, password=password)
+
     def _get_uid_with_email(self, email):
         user_data = auth.get_user_by_email(email)
         uid = user_data.uid
         return uid
+    
 
 
 class AuthenticationFake():
@@ -78,6 +82,9 @@ class AuthenticationFake():
         self.user_data = data
 
     def delete_user(self, email):
+        return True
+
+    def create_user(self, email, password):
         return True
 
 auth_service = AuthenticationFirebase() if os.environ['APP_SETTINGS'] != 'testing' else AuthenticationFake()

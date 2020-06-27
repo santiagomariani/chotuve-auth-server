@@ -70,12 +70,19 @@ class UsersRoutes(Resource):
         parser.add_argument("phone_number", location="json", required=False, default="", type=str)
         parser.add_argument("image_location", location="json", required=False, default="", type=str)
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
+        # creating user in web
+        parser.add_argument("password", location='json', required=False, type=str)
 
         args = parser.parse_args()
 
         email_associated_with_token = auth_service.verify_id_token(args['x-access-token'])['email']
 
-        if email_associated_with_token != args['email']:
+        user = User.query.filter_by(email=email_associated_with_token).first()
+
+        # the first if is for the user created in the web
+        if (user and user.admin):
+            auth_service.create_user(args['email'], args['password'])
+        elif email_associated_with_token != args['email']:
             raise UserUnauthorizedError(f"Token is invalid.")
 
         user = User(email=args['email'],
