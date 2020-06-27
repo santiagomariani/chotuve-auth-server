@@ -20,11 +20,11 @@ class AuthenticationFirebase():
         return user_data
 
     def update_password(self, email, password):
-        uid = _get_uid_with_email(email)
+        uid = self._get_uid_with_email(email)
         auth.update_user(uid, password=password)
 
     def delete_user(self, email):
-        uid = _get_uid_with_email(email)
+        uid = self._get_uid_with_email(email)
         auth.delete_user(uid)
 
     def _get_uid_with_email(self, email):

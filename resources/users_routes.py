@@ -147,7 +147,8 @@ class UniqueUserRoutes(Resource):
 
     @check_token_and_get_user
     def delete(user, self, user_id):
-
+        print("HOLA")
+        print(type(user))
         if not user.admin:
             if user.id != user_id:
                 raise UserUnauthorizedError(f"Only admins can delete other users.")
@@ -167,7 +168,7 @@ class UniqueUserRoutes(Resource):
         return response
     
     def options(self, user_id):
-        return {'Allow' : 'PUT' }, 200, \
+        return {'Allow' : 'PUT,GET,POST,DELETE'}, 200, \
         { 'Access-Control-Allow-Origin': '*', \
         'Access-Control-Allow-Methods' : 'PUT,GET,POST,DELETE',
         'Access-Control-Allow-Headers':'Content-Type,Authorization,x-access-token' }
