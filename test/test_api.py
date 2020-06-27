@@ -424,3 +424,99 @@ def test_get_users_per_page(testapp, db_handle):
     assert json_data['page'] == 3
     assert json_data['total'] == 12
 
+def test_delete_user_as_admin(testapp, db_handle):
+    user_to_delete = User(email='sevaaborrar@gmail.com',
+                    display_name='Se Borra',
+                    phone_number='11111111111',
+                    image_location='http://www.youtube.com',
+                    admin=False)
+
+    user_admin = User(email='admin@gmail.com',
+                    display_name='Admin',
+                    phone_number='25642346456',
+                    image_location='http://www.youtube.com',
+                    admin=True)
+
+    db_handle.session.add(user_to_delete)
+    db_handle.session.add(user_admin)
+    db_handle.session.commit()
+    
+    auth_service.setData({'email': user_admin.email,
+                        'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'})
+    
+    response = testapp.delete(f"/users/{user_to_delete.id}", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    db.session.delete(user_admin)
+    db_handle.session.commit()
+
+    assert json_data['message'] == 'User deleted.'
+    assert response.status_code == 200
+
+def test_delete_own_user(testapp, db_handle):
+    user = User(email='sevaaborrar@gmail.com',
+                    display_name='Se Borra',
+                    phone_number='11111111111',
+                    image_location='http://www.youtube.com',
+                    admin=False)
+
+    db_handle.session.add(user)
+    db_handle.session.commit()
+    
+    auth_service.setData({'email': user.email,
+                        'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'})
+    
+    response = testapp.delete(f"/users/{user.id}", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert json_data['message'] == 'User deleted.'
+    assert response.status_code == 200
+
+def test_delete_another_user_with_no_admin_user(testapp, db_handle):
+    user_to_delete = User(email='sevaaborrar@gmail.com',
+                    display_name='Se Borra',
+                    phone_number='11111111111',
+                    image_location='http://www.youtube.com',
+                    admin=False)
+
+    user = User(email='user@gmail.com',
+                    display_name='User',
+                    phone_number='2454564652',
+                    image_location='http://www.youtube.com',
+                    admin=False)
+
+    db_handle.session.add(user_to_delete)
+    db_handle.session.add(user)
+    db_handle.session.commit()
+    
+    auth_service.setData({'email': user.email,
+                        'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'})
+    
+    response = testapp.delete(f"/users/{user_to_delete.id}", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    assert json_data['message'] == 'Only admins can delete other users.'
+    assert response.status_code == 401
+ 
+def test_delete_inexistent_user_as_admin(testapp, db_handle):
+    user_admin = User(email='admin@gmail.com',
+                    display_name='Admin',
+                    phone_number='25642346456',
+                    image_location='http://www.youtube.com',
+                    admin=True)
+
+    db_handle.session.add(user_admin)
+    db_handle.session.commit()
+    
+    auth_service.setData({'email': user_admin.email,
+                        'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'})
+    
+    inexistent_user_id = 25646
+    response = testapp.delete(f"/users/{inexistent_user_id}", headers={'x-access-token': token})
+    json_data = response.get_json()
+
+    db.session.delete(user_admin)
+    db_handle.session.commit()
+
+    assert json_data['message'] == f'No user found with ID: {inexistent_user_id}.'
+    assert response.status_code == 404

@@ -89,7 +89,6 @@ class UsersRoutes(Resource):
 
         return make_response(user_schema.jsonify(user), 201)
 
-
 #/users/<int:user_id>
 class UniqueUserRoutes(Resource):
     def __init__(self):
@@ -145,8 +144,29 @@ class UniqueUserRoutes(Resource):
         response = make_response(user_schema.jsonify(user_to_modify), 200)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
+
+    @check_token_and_get_user
+    def delete(user, self, user_id):
+
+        if not user.admin:
+            if user.id != user_id:
+                raise UserUnauthorizedError(f"Only admins can delete other users.")
+
+        user_to_delete = User.query.filter_by(id=user_id).first()
+
+        if not user_to_delete:
+                raise UserNotFoundError(f"No user found with ID: {user_id}.")
+        
+        auth_service.delete_user(user_to_delete.email)
+        
+        db.session.delete(user_to_delete)
+        db.session.commit()
+
+        response = make_response({'message': 'User deleted.'}, 200)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     
-    def options (self, user_id):
+    def options(self, user_id):
         return {'Allow' : 'PUT' }, 200, \
         { 'Access-Control-Allow-Origin': '*', \
         'Access-Control-Allow-Methods' : 'PUT,GET,POST,DELETE',
