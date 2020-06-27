@@ -66,6 +66,12 @@ class AuthenticationFake():
     def update_password(self, email, password):
         return True
 
+    def update_email(self, old_email, new_email):
+        return True
+    
+    def has_email_provider(email):
+        return True
+
     def setExpiredToken(self):
         self.expiredToken = True
         self.revokedToken = False
