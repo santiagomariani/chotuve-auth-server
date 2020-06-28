@@ -145,7 +145,7 @@ class UniqueUserRoutes(Resource):
                     auth_service.update_email(user_to_modify.email, args['email'])
                     user_to_modify.email = args['email']
                 if args['password']:
-                    auth_service.update_password(args['password'])
+                    auth_service.update_password(user_to_modify.email, args['password'])
             else:
                 raise UserBadRequestError("Cannot modify email or password if user does not have email provider.")
 
