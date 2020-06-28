@@ -2,7 +2,7 @@ from flask_restful import reqparse, Resource
 from flask import make_response
 from utils.decorators import check_token, check_token_and_get_user
 from app import db
-from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError
+from exceptions.exceptions import UserUnauthorizedError, UserNotFoundError, UserBadRequestError
 from models.models import User, user_schema, users_schema
 import logging
 from services.authentication import auth_service
