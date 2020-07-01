@@ -29,7 +29,9 @@ class AuthenticationFirebase():
     
     def has_email_provider(self, email):
         user = auth.get_user_by_email(email)
+        import logging
         logger = logging.getLogger("EMAIL PROVIDER:")
+        logger.info(user.providerData[0].providerId)
         logger.info(user.provider_id)
         return user.provider_id == 'firebase' # check for a better way of doing this!
 
