@@ -31,9 +31,9 @@ class AuthenticationFirebase():
         user = auth.get_user_by_email(email)
         import logging
         logger = logging.getLogger("EMAIL PROVIDER:")
-        logger.info(user.provider_data[0].provider_id)
-        logger.info(user.provider_id)
-        return user.provider_id == 'firebase' # check for a better way of doing this!
+        logger.debug()
+        logger.debug(user.provider_id)
+        return user.provider_data[0].provider_id == 'firebase' # check for a better way of doing this!
 
     def delete_user(self, email):
         uid = self._get_uid_with_email(email)
