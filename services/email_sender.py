@@ -27,4 +27,5 @@ class EmailSenderFake():
     def send_reset_password_email(self, receiver_email, code):
         True
 
+
 email_sender_service = EmailSender() if os.environ['APP_SETTINGS'] != 'testing' else EmailSenderFake()
