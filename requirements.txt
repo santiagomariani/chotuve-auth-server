@@ -42,3 +42,4 @@ coverage
 coveralls[yaml]
 pytest-cov
 Flask-Cors==3.0.8
+sendgrid==6.4.3
