@@ -105,4 +105,4 @@ class AuthenticationFake():
     def create_user(self, email, password):
         return True
 
-auth_service = AuthenticationFirebase() if os.environ['APP_SETTINGS'] != 'testing' else AuthenticationFake()
+auth_service = AuthenticationFirebase() if (os.environ['APP_SETTINGS'] != 'testing') else AuthenticationFake()

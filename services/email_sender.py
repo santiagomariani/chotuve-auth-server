@@ -1,7 +1,3 @@
-import smtplib, ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
 from .html import html
 import os
 from sendgrid import SendGridAPIClient
@@ -28,4 +24,4 @@ class EmailSenderFake():
         True
 
 
-email_sender_service = EmailSender() if os.environ['APP_SETTINGS'] != 'testing' else EmailSenderFake()
+email_sender_service = EmailSender() if (os.environ['APP_SETTINGS'] != 'testing') else EmailSenderFake()
