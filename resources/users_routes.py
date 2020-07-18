@@ -195,8 +195,16 @@ class UserIdFromTokenRoute(Resource):
 
     @check_token_and_get_user
     def get(user, self):
-        print(type(user))
         parser = reqparse.RequestParser()
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
         args = parser.parse_args()
         return make_response({'uid': user.id}, 200)
+
+#/users/admin
+class UserAdminRoute(Resource):
+    def __init__(self):
+        super(UserAdminRoute, self).__init__()
+    
+    @check_token_and_get_user
+    def get(user, self):
+        make_response({'admin': user.admin}, 200)
