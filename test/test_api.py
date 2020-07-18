@@ -520,3 +520,45 @@ def test_delete_inexistent_user_as_admin(testapp, db_handle):
 
     assert json_data['message'] == f'No user found with ID: {inexistent_user_id}.'
     assert response.status_code == 404
+
+def test_get_user_admin_info_with_admin_user(testapp, db_handle):
+    user_admin = User(email='admin@gmail.com',
+                    display_name='Admin',
+                    phone_number='25642346456',
+                    image_location='http://www.youtube.com',
+                    admin=True)
+    db_handle.session.add(user_admin)
+    db_handle.session.commit()
+    
+    auth_service.setData({'email': user_admin.email,
+                        'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'})
+
+    response = testapp.get('/users/admin', headers={'x-access-token': token}) 
+    json_data = response.get_json()
+
+    assert json_data['admin'] == True
+    assert response.status_code == 200
+
+    db.session.delete(user_admin)
+    db_handle.session.commit()
+
+def test_get_user_admin_info_with_normal_user(testapp, db_handle):
+    user = User(email='jorge@gmail.com',
+                    display_name='Jorge Martin',
+                    phone_number='25642346456',
+                    image_location='http://www.youtube.com',
+                    admin=False)
+    db_handle.session.add(user)
+    db_handle.session.commit()
+    
+    auth_service.setData({'email': user.email,
+                        'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'})
+
+    response = testapp.get('/users/admin', headers={'x-access-token': token}) 
+    json_data = response.get_json()
+
+    assert json_data['admin'] == False
+    assert response.status_code == 200
+
+    db.session.delete(user)
+    db_handle.session.commit()
