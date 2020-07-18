@@ -2,6 +2,7 @@ from exceptions.exceptions import UserUnauthorizedError
 import firebase_admin
 import os
 from firebase_admin import auth
+import logging
 
 class AuthenticationFirebase():
 
@@ -29,7 +30,6 @@ class AuthenticationFirebase():
     
     def has_email_provider(self, email):
         user = auth.get_user_by_email(email)
-        import logging
         logger = logging.getLogger("EMAIL PROVIDER:")
         logger.debug(user.provider_data[0].provider_id)
         logger.debug(user.provider_id)
