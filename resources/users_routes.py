@@ -207,4 +207,4 @@ class UserAdminRoute(Resource):
     
     @check_token_and_get_user
     def get(user, self):
-        make_response({'admin': user.admin}, 200)
+        return make_response({'admin': user.admin}, 200)
