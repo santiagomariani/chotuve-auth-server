@@ -208,3 +208,16 @@ class UserAdminRoute(Resource):
     @check_token_and_get_user
     def get(user, self):
         return make_response({'admin': user.admin}, 200)
+
+#/users/<int:user_id>/admin
+class UniqueUserAdminRoute(Resource):
+  def __init__(self):
+    super(UniqueUserAdminRoute, self).__init__()
+
+  def get(self, user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user:
+      return make_response({'admin': user.admin}, 200)
+    raise UserNotFoundError(f"No user found with ID: {user_id}.") 
+
+    
