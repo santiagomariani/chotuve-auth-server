@@ -7,6 +7,7 @@ from flask_restful import Api
 from flask_restful.utils import cors
 from flask_cors import CORS
 from config import app_config
+from exceptions.exceptions import ClientUnauthorizedError
 
 # database
 db = SQLAlchemy()
@@ -52,5 +53,11 @@ def create_app(config_name):
                 automatic_options = False
             )
     ]
+
+    @app.before_request
+    def client_token():
+      client_token = request.headers.get('x-client-token')
+      if (os.environ['AUTH_CLIENT_TOKEN'] != client_token):
+        raise ClientUnauthorizedError(f"Auth client token is invalid.")
 
     return app
