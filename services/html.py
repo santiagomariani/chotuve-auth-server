@@ -107,7 +107,7 @@ html = """
 
     <!-- start preheader -->
     <div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-        A preheader is the short summary text that follows the subject line when an email is viewed in the inbox.
+        Toma el código de 6 dígitos para ingresar en tu aplicación mobil y recuperar tu contraseña.
     </div>
     <!-- end preheader -->
 
@@ -125,7 +125,7 @@ html = """
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
             <tr>
                 <td align="left" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
-                <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Reset Your Password - Chotuve</h1>
+                <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Recupera tu cuenta - Chotuve</h1>
                 </td>
             </tr>
             </table>
@@ -151,7 +151,7 @@ html = """
             <!-- start copy -->
             <tr>
                 <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                <p style="margin: 0;">Hi! If you want to reset your password you have to introduce the 6 digit code shown below in the mobile application. If you didn't request a password recovery/reset, you can safely delete this email. </p>
+                <p style="margin: 0;">Hola! Si quieres resetear tu contraseña tienes que introducir, en la aplicación mobil, el código de 6 dígitos que se muestra debajo. Si no solicitaste un reseteo/recuperación de contraseña puedes borrar este mail.</p>
                 </td>
             </tr>
             <!-- end copy -->
@@ -177,7 +177,7 @@ html = """
             <!-- start copy -->
             <tr>
                 <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf">
-                <p style="margin: 0;">See ya!<br> Chotuve Videos Team</p>
+                <p style="margin: 0;">Nos vemos luego!<br>Equipo de Chotuve Videos</p>
                 </td>
             </tr>
             <!-- end copy -->
