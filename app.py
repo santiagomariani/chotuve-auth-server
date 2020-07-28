@@ -54,10 +54,11 @@ def create_app(config_name):
             )
     ]
 
-    @app.before_request
-    def client_token():
-      client_token = request.headers.get('x-client-token')
-      if (os.environ['AUTH_CLIENT_TOKEN'] != client_token):
-        raise ClientUnauthorizedError(f"Auth client token is invalid.")
+    if (os.environ['APP_SETTINGS'] != 'testing'):
+      @app.before_request
+      def client_token():
+        client_token = request.headers.get('x-client-token')
+        if (os.environ['AUTH_CLIENT_TOKEN'] != client_token):
+          raise ClientUnauthorizedError(f"Auth client token is invalid.")
 
     return app
