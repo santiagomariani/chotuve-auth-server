@@ -36,3 +36,10 @@ Pyrebase4==4.3.0
 Flask-Failsafe==0.2
 pdp==0.3.0
 firebase-admin==4.3.0
+Flask-RESTful==0.3.8
+pytest-env==0.6.2
+coverage
+coveralls[yaml]
+pytest-cov
+Flask-Cors==3.0.8
+sendgrid==6.4.3

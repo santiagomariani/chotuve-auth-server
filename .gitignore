@@ -5,3 +5,4 @@ postgres_data/
 .vscode/
 .devcontainer/
 chotuve-videos-firebase-adminsdk.json
+todo.md
