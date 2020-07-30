@@ -1,0 +1,333 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: API Auth Server
+  description: API del Auth Server de la aplicacion Chotuve.
+
+schemes: 
+  - https
+host: chotuve-auth-server-11.herokuapp.com
+tags:
+  - name: users
+    description: Usuario de chotuve
+  - name: reset-codes
+    description: Reset Code de usuario.
+paths:
+  /users:
+    get:
+      tags:
+      - users
+      summary: Obtener usuarios
+      description: Se pueden obtener usuarios con paginacion y filtrando por parametros query. Se hace un OR con email, phone, y name. Es case sensitive.
+      produces:
+      - application/json
+      parameters:
+        - in: query
+          name: email
+          type: string
+          description: Valor que quiero que este contenido en el email del usuario.
+        - in: query
+          name: phone
+          type: string
+          description: Valor que quiero que este contenido en el phone number del usuario.
+        - in: query
+          name: name
+          type: string
+          description: Valor que quiero que este contenido en el display name del usuario.
+        - in: query
+          name: per_page
+          type: integer
+          description: Numero de usuarios que quiero obtener (como maximo) por pagina.
+        - in: query
+          name: page
+          type: integer
+          description: Numero de pagina de usuarios que quiero obtener.
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+        - in: header
+          name: x-access-token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Se devolvieron los usuarios satisfactoriamente
+          schema:
+            $ref: '#/definitions/UserArray'
+        "400":
+          description: Request mal formado.
+        "401":
+          description: Usuario no autorizado (token expirado, invalido o revokado) o cliente no autorizado.
+    post:
+      tags:
+      - users
+      summary: Crear usuario
+      description: Registra un usuario.
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+        - in: header
+          name: x-access-token
+          required: true
+          type: string
+      responses:
+        "201":
+          description: Se registra el usuario satisfactoriamente.
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Request mal formado.
+        "401":
+          description: Usuario no autorizado (token expirado, invalido, revokado, o email asociado a token es distinto al que se envia) o cliente no autorizado.
+  /users/{user_id}:
+    get:
+      tags:
+      - users
+      summary: Obtener datos de un usuario.
+      description: Se obtienen los datos del usuario con id user_id.
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+        - in: header
+          name: x-access-token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Se devuelven satisfactoriamente los datos del usuario con id user_id.
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Request mal formado.
+        "401":
+          description: Usuario no autorizado (token expirado, invalido, revokado) o cliente no autorizado.
+        "404":
+          description: No se encontro el usuario con id user_id.
+          
+    put:
+      tags:
+      - users
+      summary: Modificar datos de un usuario.
+      description: Se modifican los datos del usuario con id user_id.
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/User'
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+        - in: header
+          name: x-access-token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Se devuelven los datos del usuario (modificado) con id user_id.
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Request mal formado.
+        "401":
+          description: Usuario no autorizado (token expirado, invalido, revokado o se intento modificar los datos de un usuario ajeno sin ser admin) o cliente no autorizado.
+        "404":
+          description: No se encontro el usuario con id user_id.
+    delete:
+      tags:
+      - users
+      summary: Borrar un usuario.
+      description: Se borra el usuario con id user_id.
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+        - in: header
+          name: x-access-token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Se borra satisfactoriamente el usuario con id user_id.
+        "401":
+          description: Usuario no autorizado (token expirado, invalido, revokado o se intento eliminar un usuario ajeno sin ser admin) o cliente no autorizado.
+        "404":
+          description: No se encontro el usuario con id user_id.
+  /users/id:
+    get:
+      tags:
+      - users
+      summary: Obtener id de usuario a partir del token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Se obtiene el user_id del usuario asociado al token id.
+        "401":
+          description: Usuario no autorizado (token expirado, invalido, revokado) o cliente no autorizado.
+      parameters:
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+        - in: header
+          name: x-access-token
+          required: true
+          type: string
+  /users/admin:
+    get:
+      tags:
+      - users
+      summary: Obtengo informacion sobre si el usuario es admin o no.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Se obtiene informacion sobre si el usuario asociado al token id es admin o no.
+        "401":
+          description: Usuario no autorizado (token expirado, invalido, revokado) o cliente no autorizado.
+      parameters:
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+        - in: header
+          name: x-access-token
+          required: true
+          type: string
+  /users/{user_id}/admin:
+    get:
+      tags:
+      - users
+      summary: Obtengo informacion sobre si el usuario con id user_id es admin o no.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Se obtiene informacion sobre si el usuario con id user_id es admin o no.
+        "404":
+          description: No se encontro el usuario con id user_id.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+  
+  /reset-codes:
+    post:
+      tags:
+      - reset-codes
+      summary: Genera un reset code y lo envia por email, para resetear la contraseña de la cuenta asociada al email indicado.
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Se genero el reset code y se envio por email satisfactoriamente.
+        "404":
+          description: No se encontro un usuario asociado al email indicado.
+        "400":
+          description: Request mal formado.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            properties:
+              email:
+                type: string
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+  /reset-codes/change-password-with-reset-code:
+    post:
+      tags:
+      - reset-codes
+      summary: Recibe el reset code y cambia la contraseña del usuario (si el reset code es valido).
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Se cambio la contraseña del usuario satisfactoriamente.
+        "401":
+          description: Reset code invalido o expirado.
+        "400":
+          description: Request mal formado.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+              code:
+                type: string
+        - in: header
+          name: x-client-token
+          required: true
+          type: string
+definitions:
+  User:
+    type: object
+    properties:
+      display_name:
+        type: string
+      email:
+        type: string
+      phone_number:
+        type: string
+      image_location:
+        type: string
+      #admin:
+      #   type: boolean
+  UserArray:
+    type: array
+    items:
+      $ref: '#/definitions/User'

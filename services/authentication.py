@@ -4,6 +4,7 @@ import os
 from firebase_admin import auth
 import logging
 
+
 class AuthenticationFirebase():
 
     def __init__(self):
@@ -27,13 +28,14 @@ class AuthenticationFirebase():
     def update_email(self, old_email, new_email):
         uid = self._get_uid_with_email(old_email)
         auth.update_user(uid, email=new_email)
-    
+
     def has_email_provider(self, email):
         user = auth.get_user_by_email(email)
         logger = logging.getLogger("EMAIL PROVIDER:")
         logger.debug(user.provider_data[0].provider_id)
         logger.debug(user.provider_id)
-        return user.provider_data[0].provider_id == 'password' # check for a better way of doing this!
+        # check for a better way of doing this!
+        return user.provider_data[0].provider_id == 'password'
 
     def delete_user(self, email):
         uid = self._get_uid_with_email(email)
@@ -46,14 +48,14 @@ class AuthenticationFirebase():
         user_data = auth.get_user_by_email(email)
         uid = user_data.uid
         return uid
-    
 
 
 class AuthenticationFake():
 
     def __init__(self):
-        self.user_data = {'email': 'santiagomariani2@gmail.com', 'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'}
-        
+        self.user_data = {'email': 'santiagomariani2@gmail.com',
+                          'uid': '4cNAU9ovw6eD0KH5Qq7S91CXIZx2'}
+
         self.expiredToken = False
         self.revokedToken = False
         self.invalidToken = False
@@ -66,13 +68,13 @@ class AuthenticationFake():
         if self.invalidToken:
             raise UserUnauthorizedError(f"Token is invalid.")
         return self.user_data
-    
+
     def update_password(self, email, password):
         return True
 
     def update_email(self, old_email, new_email):
         return True
-    
+
     def has_email_provider(self, email):
         return True
 
@@ -85,7 +87,7 @@ class AuthenticationFake():
         self.revokedToken = True
         self.expiredToken = False
         self.invalidToken = False
-    
+
     def setInvalidToken(self):
         self.invalidToken = True
         self.expiredToken = False
@@ -105,4 +107,6 @@ class AuthenticationFake():
     def create_user(self, email, password):
         return True
 
-auth_service = AuthenticationFirebase() if (os.environ['APP_SETTINGS'] != 'testing') else AuthenticationFake()
+
+auth_service = AuthenticationFirebase() if (
+    os.environ['APP_SETTINGS'] != 'testing') else AuthenticationFake()
