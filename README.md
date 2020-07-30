@@ -24,3 +24,4 @@
 ## API 1.0.0
 
 [Especificacion Open Api 2.0](https://app.swaggerhub.com/apis-docs/chotuvevideos/api-auth_server/1.0.0#/)
+[Open Api - archivo ymaml](https://github.com/santiagomariani/chotuve-auth-server/blob/master/OPENAPI.yaml)
