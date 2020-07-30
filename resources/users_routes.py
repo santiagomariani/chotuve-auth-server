@@ -48,6 +48,8 @@ class UsersRoutes(Resource):
         if (not_searching):
             query = User.query
 
+        self.logger.info(f"Returning users successfully. RESPONSECODE:200")
+
         # TODO: probablemente tenga que hacer que per_page y page sean obligatorios.
         # En la realidad no seria posible devolver todos los datos.
         if args['per_page'] and args['page']:
@@ -83,7 +85,8 @@ class UsersRoutes(Resource):
         if (user and user.admin):
             auth_service.create_user(args['email'], args['password'])
         elif email_associated_with_token != args['email']:
-            raise UserUnauthorizedError(f"Token is invalid.")
+          self.logger.error(f"Cannot register user because email is not associated with token. RESPONSECODE:401")
+          raise UserUnauthorizedError(f"Token is invalid.")
 
         user = User(email=args['email'],
                     display_name=args['display_name'],
@@ -94,12 +97,15 @@ class UsersRoutes(Resource):
         db.session.add(user)
         db.session.commit()
 
+        self.logger.info(f"User created successfully. RESPONSECODE:201")
+
         return make_response(user_schema.jsonify(user), 201)
 
 #/users/<int:user_id>
 class UniqueUserRoutes(Resource):
     def __init__(self):
         super(UniqueUserRoutes, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
     
     @check_token
     def get(self, user_id):
@@ -113,7 +119,10 @@ class UniqueUserRoutes(Resource):
         user = User.query.filter_by(id=user_id).first()
         
         if not user:
+            self.logger.error(f"No user found with id: {user_id}. RESPONSECODE:404")
             raise UserNotFoundError(f"No user found with ID: {user_id}")
+
+        self.logger.info(f"User with id: {user_id} is returned successfully. RESPONSECODE:200")
         return make_response(user_schema.jsonify(user), 200)
 
     @check_token_and_get_user
@@ -132,11 +141,13 @@ class UniqueUserRoutes(Resource):
                 
         if not user.admin:
             if user.id != user_id:
+                self.logger.error(f"User with id: {user.id} cannot modify others users data because is not admin. RESPONSECODE:401")
                 raise UserUnauthorizedError(f"Only admins can change others users data.")
 
         user_to_modify = User.query.filter_by(id=user_id).first()
 
         if not user_to_modify:
+            self.logger.error(f"No user found with id: {user_id}. RESPONSECODE:404")
             raise UserNotFoundError(f"No user found with ID: {user_id}.")
 
         if (args['email'] or args['password']):
@@ -147,6 +158,7 @@ class UniqueUserRoutes(Resource):
                 if args['password']:
                     auth_service.update_password(user_to_modify.email, args['password'])
             else:
+                self.logger.error(f"Cannot modify user: {user_id} because it does not have email provider. RESPONSECODE:400")
                 raise UserBadRequestError("Cannot modify email or password if user does not have email provider.")
 
         if args['display_name']:
@@ -157,6 +169,7 @@ class UniqueUserRoutes(Resource):
             user_to_modify.phone_number = args['phone_number']
         
         db.session.commit()
+        self.logger.info(f"User with id: {user_id} is modified successfully. RESPONSECODE:200")
         response = make_response(user_schema.jsonify(user_to_modify), 200)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
@@ -165,18 +178,21 @@ class UniqueUserRoutes(Resource):
     def delete(user, self, user_id):
         if not user.admin:
             if user.id != user_id:
+                self.logger.error(f"User with id: {user.id} is not able to modify others users data because is not admin. RESPONSECODE:401")
                 raise UserUnauthorizedError(f"Only admins can delete other users.")
 
         user_to_delete = User.query.filter_by(id=user_id).first()
 
         if not user_to_delete:
-                raise UserNotFoundError(f"No user found with ID: {user_id}.")
+          self.logger.error(f"No user found with id: {user_id}. RESPONSECODE:404")
+          raise UserNotFoundError(f"No user found with ID: {user_id}.")
         
         auth_service.delete_user(user_to_delete.email)
         
         db.session.delete(user_to_delete)
         db.session.commit()
 
+        self.logger.info(f"User with id: {user_id} deleted successfully. RESPONSECODE:200")
         response = make_response({'message': 'User deleted.'}, 200)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
@@ -191,33 +207,40 @@ class UniqueUserRoutes(Resource):
 #/users/id
 class UserIdFromTokenRoute(Resource):
     def __init__(self):
-        super(UserIdFromTokenRoute, self).__init__()
+      super(UserIdFromTokenRoute, self).__init__()
+      self.logger = logging.getLogger(self.__class__.__name__)
 
     @check_token_and_get_user
     def get(user, self):
         parser = reqparse.RequestParser()
         parser.add_argument("x-access-token", location='headers', required=True, help="Missing user's token.")
         args = parser.parse_args()
+        self.logger.info(f"Id: {user.id} of user returned successfully. RESPONSECODE:200")
         return make_response({'uid': user.id}, 200)
 
 #/users/admin
 class UserAdminRoute(Resource):
     def __init__(self):
-        super(UserAdminRoute, self).__init__()
+      super(UserAdminRoute, self).__init__()
+      self.logger = logging.getLogger(self.__class__.__name__)
     
     @check_token_and_get_user
     def get(user, self):
-        return make_response({'admin': user.admin}, 200)
+      self.logger.info(f"User admin info of user with id: {user.id} returned successfully. RESPONSECODE:200")
+      return make_response({'admin': user.admin}, 200)
 
 #/users/<int:user_id>/admin
 class UniqueUserAdminRoute(Resource):
   def __init__(self):
     super(UniqueUserAdminRoute, self).__init__()
+    self.logger = logging.getLogger(self.__class__.__name__)
 
   def get(self, user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:
+      self.logger.info(f"Id: {user_id} of user returned successfully. RESPONSECODE:200")
       return make_response({'admin': user.admin}, 200)
+    self.logger.error(f"No user found with id: {user_id}. RESPONSECODE:404")
     raise UserNotFoundError(f"No user found with ID: {user_id}.") 
 
     
